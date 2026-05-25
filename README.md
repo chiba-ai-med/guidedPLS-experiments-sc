@@ -1,51 +1,91 @@
 # guidedPLS-experiments-sc
 
-guided-PLS による single-cell マルチオミクス (scRNA-Seq / scATAC-Seq) 統合実験。
-複数データセット (Organogenesis, Testis) に対する guided-PLS の評価と比較手法 (Seurat, Harmony, Scanorama) との性能比較を行う Snakemake ワークフロー。
+A reproducible Snakemake workflow that benchmarks **guided-PLS** for the integration of single-cell multi-omics data (scRNA-Seq / scATAC-Seq) against established baseline methods (Seurat, Harmony, Scanorama). Two datasets are analyzed: mouse organogenesis (E8.5/E9.5/E10.5) and mouse testis (E18/P0/P3/P6).
+
+This repository is one of three sibling repositories that together support a single manuscript on guided-PLS:
+
+- [`chiba-ai-med/guidedPLS-experiments-sc`](https://github.com/chiba-ai-med/guidedPLS-experiments-sc) — **this repository** (single-cell multi-omics)
+- [`chiba-ai-med/guidedPLS-experiments-bulk`](https://github.com/chiba-ai-med/guidedPLS-experiments-bulk) — bulk multi-omics experiments
+- [`chiba-ai-med/ImageRegistration-experiments3`](https://github.com/chiba-ai-med/ImageRegistration-experiments3) — image-registration experiments
 
 ## Workflow
 
-統合 Snakefile (`workflow/Snakefile`) が以下のサブワークフローを include する構成。
+The pipeline is driven by a single top-level `workflow/Snakefile` that `include:`s the six sub-workflows listed below. Each sub-workflow is shared across datasets where possible; dataset-specific preprocessing is split into its own `.smk` file.
 
-- **workflow/preprocess_organogenesis.smk**: Organogenesis (E8.5/E9.5/E10.5) scRNA-Seq / scATAC-Seq の前処理
-- **workflow/preprocess_testis.smk**: Testis (E18/P2-3/P6-7) scRNA-Seq / scATAC-Seq の前処理
-- **workflow/prepare_inputs.smk**: guided-PLS 入力データ (X1, X2, Y1, Y2) の準備
-- **workflow/run_guidedpls.smk**: guided-PLS 実行
-- **workflow/run_comparison.smk**: 比較手法 (Seurat, Harmony, Scanorama) の実行
-- **workflow/evaluate.smk**: 評価指標 (accuracy, ARI, NMI, per-class F1) の計算と可視化
+- **workflow/preprocess_organogenesis.smk**: Preprocessing of Organogenesis scRNA-Seq (GSE186068/GSE186069) and scATAC-Seq (CNP0003941) data for E8.5, E9.5, and E10.5 embryos.
+- **workflow/preprocess_testis.smk**: Preprocessing of Testis scRNA-Seq and scATAC-Seq (ArchR project) data for E18/P0/P3/P6.
+- **workflow/prepare_inputs.smk**: Construction of guided-PLS input matrices `X1`, `X2`, `Y1`, `Y2` from the preprocessed objects, parameterized by guide condition.
+- **workflow/run_guidedpls.smk**: Execution of guided-PLS across all guide conditions defined in `config/config.yaml`.
+- **workflow/run_comparison.smk**: Execution of baseline integration methods (`Seurat`, `Harmony`, `Scanorama`).
+- **workflow/evaluate.smk**: Quantitative evaluation (accuracy, balanced accuracy, ARI, NMI, macro/weighted F1, per-class F1) and visualization (bar plots, confusion matrices).
 
 ![](https://github.com/chiba-ai-med/guidedPLS-experiments-sc/blob/main/plot/Snakefile.png?raw=true)
 
+A static HTML report covering all rules is available at `report/Snakefile.html` (regenerable via `bash workflow/report.sh`).
+
 ## Requirements
 
+- Bash: GNU bash 4.0+
 - Snakemake: 8.10.0
-- Graphviz (DAG 生成用)
-- R / Python (各 `src/` スクリプトの依存パッケージ)
+- Graphviz: any recent version (used by `workflow/dag.sh` to render the DAG)
+- R (≥ 4.3) with `guidedPLS`, `Seurat`, `Harmony`, `Signac`, `ArchR`
+- Python (≥ 3.10) with `scanorama`, `scanpy`, `scikit-learn`
+
+The recommended environment on the development machine is the `snakemake` conda env, which already bundles Snakemake and Graphviz:
+
+```bash
+conda activate snakemake
+```
+
+R- and Python-side dependencies are isolated in separate conda envs (`r-guidedpls`, `r_4.3`, etc.) and are invoked from individual rules.
 
 ## How to reproduce this workflow
 
-### Run the pipeline
+### In Local Machine
 
 ```bash
+# Full pipeline (all datasets, all guide conditions, all methods)
 snakemake -s workflow/Snakefile --cores 8 -p
-```
 
-データセット単位での実行:
-
-```bash
+# Single dataset
 snakemake -s workflow/Snakefile --cores 8 -p dataset --config dataset=Organogenesis
+snakemake -s workflow/Snakefile --cores 8 -p dataset --config dataset=Testis
 ```
 
-### Regenerate the DAG and report
+### In Open Grid Engine
 
 ```bash
-bash workflow/dag.sh      # → plot/Snakefile.png
-bash workflow/report.sh   # → report/Snakefile.html
+snakemake -s workflow/Snakefile -j 32 --cluster qsub --latency-wait 600
+```
+
+### In Slurm
+
+```bash
+snakemake -s workflow/Snakefile -j 32 --cluster sbatch --latency-wait 600
+```
+
+### Regenerate the DAG and the HTML report
+
+```bash
+bash workflow/dag.sh      # -> plot/Snakefile.png
+bash workflow/report.sh   # -> report/Snakefile.html
 ```
 
 ## Outputs
 
-- `output/{dataset}/evaluation/metrics.csv` — accuracy / ARI / NMI のまとめ
-- `output/{dataset}/evaluation/per_class_f1.csv` — クラスごとの F1
-- `output/{dataset}/figures/` — 棒グラフ・confusion matrix
-- `plot/Figures/` — 論文用に手動でピックアップした図を格納予定
+Raw data (`data/`, ~36 GB) and intermediate Snakemake outputs (`output/`, ~14 GB) are excluded from version control via `.gitignore` and must be regenerated by running the workflow.
+
+The persistent, version-controlled outputs are:
+
+- `output/{dataset}/evaluation/metrics.csv` — summary metrics (accuracy / ARI / NMI / F1) per method
+- `output/{dataset}/evaluation/per_class_f1.csv` — per-class F1 scores
+- `output/{dataset}/figures/` — automatically generated bar plots and confusion matrices for every method
+- `plot/Figures/` — manuscript-quality figures, hand-curated from `output/{dataset}/figures/` and any additional plots produced ad hoc. This directory is the canonical source for figures included in the paper.
+
+## License
+
+Copyright (c) 2026 Artificial Intelligence Medicine. Released under the [MIT License](LICENSE).
+
+## Authors
+
+- Koki Tsuyuzaki
