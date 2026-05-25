@@ -1,0 +1,29 @@
+# ============================================================
+# Data & pipeline outputs (regeneratable, too large for GitHub)
+# ============================================================
+data/
+output/
+.snakemake/
+
+# ============================================================
+# Stray R/Python artifacts
+# ============================================================
+Rplots.pdf
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# ============================================================
+# OS / editor cruft
+# ============================================================
+.DS_Store
+Thumbs.db
+*~
+*.swp
+.vscode/
+.idea/

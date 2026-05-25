@@ -1,0 +1,66 @@
+# =============================================================================
+# guided-PLS scRNA-Seq / scATAC-Seq 統合実験
+# =============================================================================
+#
+# 使い方:
+#   snakemake -s workflow/Snakefile --cores 8 -p
+#   snakemake -s workflow/Snakefile --cores 8 -p -- output/Testis/evaluation/metrics.csv
+#
+# データセット追加時: config/config.yaml の datasets に追加し、
+#   workflow/preprocess_{name}.smk と src/preprocess_{name}_*.R を作成。
+# =============================================================================
+
+configfile: "config/config.yaml"
+
+# =========================================================================
+# データセット・条件の定義
+# =========================================================================
+DATASETS       = config["datasets"]                      # {name: {guide_conditions, ...}}
+DATASET_NAMES  = list(DATASETS.keys())                   # ["Organogenesis", "Testis", ...]
+
+# データセットごとのガイド条件・比較手法
+def guide_conditions_for(dataset):
+    return DATASETS[dataset]["guide_conditions"]
+
+def comparison_methods_for(dataset):
+    return DATASETS[dataset].get("comparison_methods",
+        config.get("default_comparison_methods", []))
+
+def all_methods_for(dataset):
+    return (
+        ["guidedpls_" + c for c in guide_conditions_for(dataset)]
+        + comparison_methods_for(dataset)
+    )
+
+# =========================================================================
+# サブワークフロー読み込み
+# =========================================================================
+include: "preprocess_organogenesis.smk"
+include: "preprocess_testis.smk"
+include: "prepare_inputs.smk"
+include: "run_guidedpls.smk"
+include: "run_comparison.smk"
+include: "evaluate.smk"
+
+# =========================================================================
+# ターゲット
+# =========================================================================
+def all_outputs():
+    out = []
+    for ds in DATASET_NAMES:
+        out.append(f"output/{ds}/evaluation/metrics.csv")
+        out.append(f"output/{ds}/figures/barplot_accuracy.png")
+    return out
+
+rule all:
+    input: all_outputs()
+
+# データセット単位のターゲット
+rule dataset:
+    input:
+        lambda wc: [
+            f"output/{wc.dataset}/evaluation/metrics.csv",
+            f"output/{wc.dataset}/figures/barplot_accuracy.png",
+        ]
+    wildcard_constraints:
+        dataset="|".join(DATASET_NAMES)

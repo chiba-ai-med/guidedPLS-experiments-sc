@@ -1,0 +1,45 @@
+# =============================================================================
+# guided-PLS scRNA-Seq / scATAC-Seq 統合実験 設定ファイル
+# =============================================================================
+
+# =========================================================================
+# データセット定義 — 新規データセット追加時はここを編集
+# =========================================================================
+datasets:
+  Organogenesis:
+    guide_conditions:
+      - "none"
+      - "stage"
+      - "germlayer"
+      - "stage_germlayer"
+    comparison_methods:
+      - "seurat"
+      - "harmony"
+      - "scanorama"
+    stages: ["E8.5", "E9.5", "E10.5"]
+
+  Testis:
+    guide_conditions:
+      - "none"
+      - "stage_binned"
+    comparison_methods: []   # GAMなし（fragmentバーコード形式の問題）
+    stages: ["E18", "P2-3", "P6-7"]
+
+# --- 比較手法のデフォルト (datasetsで未指定の場合) ---
+default_comparison_methods:
+  - "seurat"
+  - "harmony"
+  - "scanorama"
+
+# --- 前処理パラメータ ---
+subsample_n: 10000
+min_genes_rna: 500
+min_peaks_atac: 500
+n_hvg: 3000
+
+# --- guided-PLS パラメータ ---
+guidedpls_r: 18
+guidedpls_k: 11
+
+# --- 再現性 ---
+random_seed: 42
