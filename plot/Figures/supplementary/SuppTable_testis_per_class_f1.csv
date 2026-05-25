@@ -1,0 +1,21 @@
+method,celltype,f1
+guidedpls_none,Endothelial cells,0.017804154302670624
+guidedpls_none,Germ cells,0.04242424242424243
+guidedpls_none,Innate lymph,0.0
+guidedpls_none,Leydig cells,0.05204460966542751
+guidedpls_none,Macrophages,0.011363636363636364
+guidedpls_none,Neutrophils,0.0
+guidedpls_none,PTM,0.166031094162511
+guidedpls_none,Sertoli cells,0.19043107531975367
+guidedpls_none,Stroma,0.4565882196516421
+guidedpls_none,Vascular mural cells,0.0
+guidedpls_stage_binned,Endothelial cells,0.011111111111111112
+guidedpls_stage_binned,Germ cells,0.2722029988465975
+guidedpls_stage_binned,Innate lymph,0.005917159763313609
+guidedpls_stage_binned,Leydig cells,0.09469153515064563
+guidedpls_stage_binned,Macrophages,0.0
+guidedpls_stage_binned,Neutrophils,0.0
+guidedpls_stage_binned,PTM,0.04047217537942664
+guidedpls_stage_binned,Sertoli cells,0.13759581230136475
+guidedpls_stage_binned,Stroma,0.3801602903372146
+guidedpls_stage_binned,Vascular mural cells,0.0

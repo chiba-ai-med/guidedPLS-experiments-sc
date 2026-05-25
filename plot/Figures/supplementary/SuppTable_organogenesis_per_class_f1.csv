@@ -1,0 +1,247 @@
+method,celltype,f1
+guidedpls_stage,Amniochorionic mesoderm A,0.0
+guidedpls_stage,Amniochorionic mesoderm B,0.0
+guidedpls_stage,Cardiomyocytes,0.0
+guidedpls_stage,Chondrocyte and osteoblast progenitors,0.02078239608801956
+guidedpls_stage,Di/telencephalon,0.0024242424242424242
+guidedpls_stage,Early chondrocytes,0.0
+guidedpls_stage,Endothelium,0.13192182410423453
+guidedpls_stage,Extraembryonic mesoderm,0.006042296072507553
+guidedpls_stage,Extraembryonic visceral endoderm,0.0
+guidedpls_stage,First heart field,0.046511627906976744
+guidedpls_stage,Forebrain/midbrain,0.08342245989304813
+guidedpls_stage,Gut,0.0
+guidedpls_stage,Hepatocytes,0.0
+guidedpls_stage,Hindbrain,0.03153745072273324
+guidedpls_stage,Intermediate mesoderm,0.0
+guidedpls_stage,Limb mesenchyme progenitors,0.08930669800235018
+guidedpls_stage,Megakaryocytes,0.0
+guidedpls_stage,Mesencephalon/MHB,0.0
+guidedpls_stage,Mesenchymal stromal cells,0.0018018018018018018
+guidedpls_stage,Neural crest,0.0196078431372549
+guidedpls_stage,Neural crest (PNS glia),0.0
+guidedpls_stage,Neural crest (PNS neurons),0.0
+guidedpls_stage,Neuromesodermal progenitors,0.03636363636363636
+guidedpls_stage,Neuron progenitor cells,0.0
+guidedpls_stage,Osteoblast progenitors A,0.0055248618784530384
+guidedpls_stage,Osteoblast progenitors B,0.021021021021021023
+guidedpls_stage,Paraxial mesoderm,0.0
+guidedpls_stage,Paraxial mesoderm A,0.0
+guidedpls_stage,Placodal area,0.0
+guidedpls_stage,Pre-epidermal keratinocytes,0.03067484662576687
+guidedpls_stage,Primitive erythroid cells,0.0
+guidedpls_stage,Retinal primordium,0.0
+guidedpls_stage,Roof plate,0.0
+guidedpls_stage,Skeletal muscle progenitors,0.014545454545454545
+guidedpls_stage,Somatic mesoderm,0.009876543209876543
+guidedpls_stage,Spinal cord,0.029723991507430998
+guidedpls_stage,Spinal cord (dorsal),0.0
+guidedpls_stage,Spinal cord (ventral),0.0
+guidedpls_stage,Splanchnic mesoderm,0.02443609022556391
+guidedpls_stage,White blood cells,0.0
+guidedpls_stage,floor plate,0.0
+guidedpls_germlayer,Amniochorionic mesoderm A,0.06153846153846154
+guidedpls_germlayer,Amniochorionic mesoderm B,0.026845637583892617
+guidedpls_germlayer,Cardiomyocytes,0.0
+guidedpls_germlayer,Chondrocyte and osteoblast progenitors,0.32653061224489793
+guidedpls_germlayer,Di/telencephalon,0.03260869565217391
+guidedpls_germlayer,Early chondrocytes,0.05504587155963303
+guidedpls_germlayer,Endothelium,0.049204052098408106
+guidedpls_germlayer,Extraembryonic mesoderm,0.007905138339920948
+guidedpls_germlayer,Extraembryonic visceral endoderm,0.0
+guidedpls_germlayer,First heart field,0.0
+guidedpls_germlayer,Forebrain/midbrain,0.014659685863874346
+guidedpls_germlayer,Gut,0.19444444444444445
+guidedpls_germlayer,Hepatocytes,0.03571428571428571
+guidedpls_germlayer,Hindbrain,0.23222748815165878
+guidedpls_germlayer,Intermediate mesoderm,0.0
+guidedpls_germlayer,Limb mesenchyme progenitors,0.07017543859649122
+guidedpls_germlayer,Megakaryocytes,0.0
+guidedpls_germlayer,Mesencephalon/MHB,0.04357798165137615
+guidedpls_germlayer,Mesenchymal stromal cells,0.0
+guidedpls_germlayer,Neural crest,0.0
+guidedpls_germlayer,Neural crest (PNS glia),0.05060240963855422
+guidedpls_germlayer,Neural crest (PNS neurons),0.0
+guidedpls_germlayer,Neuromesodermal progenitors,0.006633499170812604
+guidedpls_germlayer,Neuron progenitor cells,0.0
+guidedpls_germlayer,Osteoblast progenitors A,0.08163265306122448
+guidedpls_germlayer,Osteoblast progenitors B,0.033707865168539325
+guidedpls_germlayer,Paraxial mesoderm,0.0
+guidedpls_germlayer,Paraxial mesoderm A,0.0
+guidedpls_germlayer,Placodal area,0.0
+guidedpls_germlayer,Pre-epidermal keratinocytes,0.6124763705103969
+guidedpls_germlayer,Primitive erythroid cells,0.0
+guidedpls_germlayer,Retinal primordium,0.0
+guidedpls_germlayer,Roof plate,0.0
+guidedpls_germlayer,Skeletal muscle progenitors,0.04404145077720207
+guidedpls_germlayer,Somatic mesoderm,0.005319148936170213
+guidedpls_germlayer,Spinal cord,0.0
+guidedpls_germlayer,Spinal cord (dorsal),0.0030303030303030303
+guidedpls_germlayer,Spinal cord (ventral),0.014970059880239521
+guidedpls_germlayer,Splanchnic mesoderm,0.0351493848857645
+guidedpls_germlayer,White blood cells,0.0
+guidedpls_germlayer,floor plate,0.0
+guidedpls_stage_germlayer,Amniochorionic mesoderm A,0.02127659574468085
+guidedpls_stage_germlayer,Amniochorionic mesoderm B,0.0
+guidedpls_stage_germlayer,Cardiomyocytes,0.0
+guidedpls_stage_germlayer,Chondrocyte and osteoblast progenitors,0.45571166768478927
+guidedpls_stage_germlayer,Di/telencephalon,0.21654749744637386
+guidedpls_stage_germlayer,Early chondrocytes,0.049586776859504134
+guidedpls_stage_germlayer,Endothelium,0.00205761316872428
+guidedpls_stage_germlayer,Extraembryonic mesoderm,0.00823045267489712
+guidedpls_stage_germlayer,Extraembryonic visceral endoderm,0.0
+guidedpls_stage_germlayer,First heart field,0.0
+guidedpls_stage_germlayer,Forebrain/midbrain,0.49281767955801103
+guidedpls_stage_germlayer,Gut,0.42592592592592593
+guidedpls_stage_germlayer,Hepatocytes,0.0
+guidedpls_stage_germlayer,Hindbrain,0.3333333333333333
+guidedpls_stage_germlayer,Intermediate mesoderm,0.0
+guidedpls_stage_germlayer,Limb mesenchyme progenitors,0.4075907590759076
+guidedpls_stage_germlayer,Megakaryocytes,0.0
+guidedpls_stage_germlayer,Mesencephalon/MHB,0.0815450643776824
+guidedpls_stage_germlayer,Mesenchymal stromal cells,0.001899335232668566
+guidedpls_stage_germlayer,Neural crest,0.058997050147492625
+guidedpls_stage_germlayer,Neural crest (PNS glia),0.08058608058608059
+guidedpls_stage_germlayer,Neural crest (PNS neurons),0.0
+guidedpls_stage_germlayer,Neuromesodermal progenitors,0.08099688473520249
+guidedpls_stage_germlayer,Neuron progenitor cells,0.14209591474245115
+guidedpls_stage_germlayer,Osteoblast progenitors A,0.009501187648456057
+guidedpls_stage_germlayer,Osteoblast progenitors B,0.12612612612612611
+guidedpls_stage_germlayer,Paraxial mesoderm,0.0
+guidedpls_stage_germlayer,Paraxial mesoderm A,0.10632183908045977
+guidedpls_stage_germlayer,Placodal area,0.0
+guidedpls_stage_germlayer,Pre-epidermal keratinocytes,0.7116104868913857
+guidedpls_stage_germlayer,Primitive erythroid cells,0.0
+guidedpls_stage_germlayer,Retinal primordium,0.0
+guidedpls_stage_germlayer,Roof plate,0.0
+guidedpls_stage_germlayer,Skeletal muscle progenitors,0.0670391061452514
+guidedpls_stage_germlayer,Somatic mesoderm,0.0
+guidedpls_stage_germlayer,Spinal cord,0.10106382978723404
+guidedpls_stage_germlayer,Spinal cord (dorsal),0.125
+guidedpls_stage_germlayer,Spinal cord (ventral),0.01876172607879925
+guidedpls_stage_germlayer,Splanchnic mesoderm,0.016795865633074936
+guidedpls_stage_germlayer,White blood cells,0.0
+guidedpls_stage_germlayer,floor plate,0.0
+seurat,Amniochorionic mesoderm A,0.5617021276595745
+seurat,Amniochorionic mesoderm B,0.3867403314917127
+seurat,Cardiomyocytes,0.0
+seurat,Chondrocyte and osteoblast progenitors,0.45155555555555554
+seurat,Di/telencephalon,0.35774647887323946
+seurat,Early chondrocytes,0.20652173913043478
+seurat,Endothelium,0.8593350383631714
+seurat,Extraembryonic mesoderm,0.46920821114369504
+seurat,Extraembryonic visceral endoderm,0.4472049689440994
+seurat,First heart field,0.45112781954887216
+seurat,Forebrain/midbrain,0.5884016973125884
+seurat,Gut,0.3008849557522124
+seurat,Hepatocytes,0.18181818181818182
+seurat,Hindbrain,0.44529262086513993
+seurat,Intermediate mesoderm,0.018867924528301886
+seurat,Limb mesenchyme progenitors,0.7413984461709212
+seurat,Megakaryocytes,0.0
+seurat,Mesencephalon/MHB,0.2997416020671835
+seurat,Mesenchymal stromal cells,0.08631772268135904
+seurat,Neural crest,0.5546875
+seurat,Neural crest (PNS glia),0.6495726495726496
+seurat,Neural crest (PNS neurons),0.8551724137931035
+seurat,Neuromesodermal progenitors,0.4878048780487805
+seurat,Neuron progenitor cells,0.5829145728643216
+seurat,Osteoblast progenitors A,0.5206463195691203
+seurat,Osteoblast progenitors B,0.5144927536231884
+seurat,Paraxial mesoderm,0.0
+seurat,Paraxial mesoderm A,0.23501762632197415
+seurat,Placodal area,0.12727272727272726
+seurat,Pre-epidermal keratinocytes,0.6132264529058116
+seurat,Primitive erythroid cells,0.9340937896070975
+seurat,Retinal primordium,0.0
+seurat,Roof plate,0.0
+seurat,Skeletal muscle progenitors,0.5084745762711864
+seurat,Somatic mesoderm,0.23553719008264462
+seurat,Spinal cord,0.5198675496688742
+seurat,Spinal cord (dorsal),0.4835164835164835
+seurat,Spinal cord (ventral),0.5254237288135594
+seurat,Splanchnic mesoderm,0.20449438202247192
+seurat,White blood cells,0.8709677419354839
+seurat,floor plate,0.0
+harmony,Amniochorionic mesoderm A,0.31868131868131866
+harmony,Amniochorionic mesoderm B,0.016260162601626018
+harmony,Cardiomyocytes,0.0
+harmony,Chondrocyte and osteoblast progenitors,0.024759284731774415
+harmony,Di/telencephalon,0.1188118811881188
+harmony,Early chondrocytes,0.020833333333333332
+harmony,Endothelium,0.851363236587511
+harmony,Extraembryonic mesoderm,0.011976047904191617
+harmony,Extraembryonic visceral endoderm,0.6239316239316239
+harmony,First heart field,0.3557312252964427
+harmony,Forebrain/midbrain,0.0
+harmony,Gut,0.013574660633484163
+harmony,Hepatocytes,0.0
+harmony,Hindbrain,0.05664488017429194
+harmony,Intermediate mesoderm,0.0
+harmony,Limb mesenchyme progenitors,0.06378132118451026
+harmony,Megakaryocytes,0.0
+harmony,Mesencephalon/MHB,0.06417112299465241
+harmony,Mesenchymal stromal cells,0.007889546351084813
+harmony,Neural crest,0.0
+harmony,Neural crest (PNS glia),0.056338028169014086
+harmony,Neural crest (PNS neurons),0.04504504504504504
+harmony,Neuromesodermal progenitors,0.0
+harmony,Neuron progenitor cells,0.1182108626198083
+harmony,Osteoblast progenitors A,0.006430868167202572
+harmony,Osteoblast progenitors B,0.0037735849056603774
+harmony,Paraxial mesoderm,0.0
+harmony,Paraxial mesoderm A,0.0
+harmony,Placodal area,0.0
+harmony,Pre-epidermal keratinocytes,0.17699115044247787
+harmony,Primitive erythroid cells,0.9784688995215312
+harmony,Retinal primordium,0.0
+harmony,Roof plate,0.017543859649122806
+harmony,Skeletal muscle progenitors,0.0297029702970297
+harmony,Somatic mesoderm,0.0
+harmony,Spinal cord,0.0
+harmony,Spinal cord (dorsal),0.07171314741035857
+harmony,Spinal cord (ventral),0.016842105263157894
+harmony,Splanchnic mesoderm,0.0299625468164794
+harmony,White blood cells,0.8429752066115702
+harmony,floor plate,0.0
+scanorama,Amniochorionic mesoderm A,0.25219941348973607
+scanorama,Amniochorionic mesoderm B,0.18571428571428572
+scanorama,Cardiomyocytes,0.0970873786407767
+scanorama,Chondrocyte and osteoblast progenitors,0.35285285285285284
+scanorama,Di/telencephalon,0.29732620320855613
+scanorama,Early chondrocytes,0.18772563176895307
+scanorama,Endothelium,0.9021739130434783
+scanorama,Extraembryonic mesoderm,0.0
+scanorama,Extraembryonic visceral endoderm,0.4819277108433735
+scanorama,First heart field,0.10101010101010101
+scanorama,Forebrain/midbrain,0.08974358974358974
+scanorama,Gut,0.2535211267605634
+scanorama,Hepatocytes,0.03418803418803419
+scanorama,Hindbrain,0.17548746518105848
+scanorama,Intermediate mesoderm,0.04081632653061224
+scanorama,Limb mesenchyme progenitors,0.11510791366906475
+scanorama,Megakaryocytes,0.0
+scanorama,Mesencephalon/MHB,0.17445482866043613
+scanorama,Mesenchymal stromal cells,0.005934718100890208
+scanorama,Neural crest,0.0
+scanorama,Neural crest (PNS glia),0.3701923076923077
+scanorama,Neural crest (PNS neurons),0.7534246575342466
+scanorama,Neuromesodermal progenitors,0.01904761904761905
+scanorama,Neuron progenitor cells,0.49473684210526314
+scanorama,Osteoblast progenitors A,0.33573141486810554
+scanorama,Osteoblast progenitors B,0.06679035250463822
+scanorama,Paraxial mesoderm,0.0
+scanorama,Paraxial mesoderm A,0.059322033898305086
+scanorama,Placodal area,0.08695652173913043
+scanorama,Pre-epidermal keratinocytes,0.2710997442455243
+scanorama,Primitive erythroid cells,0.8306620209059233
+scanorama,Retinal primordium,0.008913649025069638
+scanorama,Roof plate,0.16
+scanorama,Skeletal muscle progenitors,0.056818181818181816
+scanorama,Somatic mesoderm,0.00554016620498615
+scanorama,Spinal cord,0.023391812865497075
+scanorama,Spinal cord (dorsal),0.2397003745318352
+scanorama,Spinal cord (ventral),0.3145299145299145
+scanorama,Splanchnic mesoderm,0.1130820399113082
+scanorama,White blood cells,0.39846743295019155
+scanorama,floor plate,0.0
