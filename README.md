@@ -2,9 +2,10 @@
 
 A reproducible Snakemake workflow that benchmarks **guided-PLS** for the integration of single-cell multi-omics data (scRNA-Seq / scATAC-Seq) against established baseline methods (Seurat, Harmony, Scanorama). Two datasets are analyzed: mouse organogenesis (E8.5/E9.5/E10.5) and mouse testis (E18/P0/P3/P6).
 
-This repository is one of three sibling repositories that together support a single manuscript on guided-PLS:
+This repository is one of four sibling repositories that together support a single manuscript on guided-PLS:
 
-- [`chiba-ai-med/guidedPLS-experiments-sc`](https://github.com/chiba-ai-med/guidedPLS-experiments-sc) — **this repository** (single-cell multi-omics)
+- [`chiba-ai-med/guidedPLS-experiments-sc`](https://github.com/chiba-ai-med/guidedPLS-experiments-sc) — **this repository** (single-cell multi-omics, Figure 3)
+- [`chiba-ai-med/guidedPLS-experiments-sim`](https://github.com/chiba-ai-med/guidedPLS-experiments-sim) — synthetic-data benchmark (Figure 2)
 - [`chiba-ai-med/guidedPLS-experiments-bulk`](https://github.com/chiba-ai-med/guidedPLS-experiments-bulk) — bulk multi-omics experiments
 - [`chiba-ai-med/ImageRegistration-experiments3`](https://github.com/chiba-ai-med/ImageRegistration-experiments3) — image-registration experiments
 

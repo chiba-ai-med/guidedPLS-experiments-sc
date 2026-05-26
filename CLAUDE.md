@@ -4,8 +4,9 @@ Claude Code がこのレポジトリで作業するときに最初に読むコ�
 
 ## このレポジトリの位置づけ
 
-論文 1 本を **3 レポジトリの結果をマージ** して書くプロジェクトの一部。
-- `chiba-ai-med/guidedPLS-experiments-sc` ← **このリポ** (single-cell マルチオミクス: scRNA + scATAC)
+論文 1 本を **4 レポジトリの結果をマージ** して書くプロジェクトの一部。
+- `chiba-ai-med/guidedPLS-experiments-sc` ← **このリポ** (single-cell マルチオミクス: scRNA + scATAC, Fig.3)
+- `chiba-ai-med/guidedPLS-experiments-sim` (合成データベンチマーク, Fig.2)
 - `chiba-ai-med/guidedPLS-experiments-bulk` (bulk オミクス)
 - `chiba-ai-med/ImageRegistration-experiments3` (画像レジストレーション)
 
