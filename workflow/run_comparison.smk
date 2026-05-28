@@ -11,6 +11,8 @@ rule run_seurat:
         atac="output/{dataset}/preprocess/atac_processed.rds",
     output:
         labels="output/{dataset}/comparison/seurat/predicted_labels.csv",
+        emb="output/{dataset}/comparison/seurat/embeddings.csv",
+    benchmark: "output/{dataset}/benchmark/seurat.tsv"
     params:
         seed=config["random_seed"],
     threads: 4
@@ -19,7 +21,7 @@ rule run_seurat:
         mkdir -p output/{wildcards.dataset}/comparison/seurat
         Rscript src/run_seurat_transfer.R \
             {input.rna} {input.atac} \
-            {output.labels} {params.seed}
+            {output.labels} {params.seed} {output.emb}
         """
 
 rule run_harmony:
@@ -28,6 +30,8 @@ rule run_harmony:
         atac="output/{dataset}/preprocess/atac_processed.rds",
     output:
         labels="output/{dataset}/comparison/harmony/predicted_labels.csv",
+        emb="output/{dataset}/comparison/harmony/embeddings.csv",
+    benchmark: "output/{dataset}/benchmark/harmony.tsv"
     params:
         seed=config["random_seed"],
         k=config["guidedpls_k"],
@@ -37,7 +41,7 @@ rule run_harmony:
         mkdir -p output/{wildcards.dataset}/comparison/harmony
         Rscript src/run_harmony_knn.R \
             {input.rna} {input.atac} \
-            {output.labels} {params.seed} {params.k}
+            {output.labels} {params.seed} {params.k} {output.emb}
         """
 
 rule run_scanorama:
@@ -46,6 +50,8 @@ rule run_scanorama:
         atac="output/{dataset}/preprocess/atac_processed.rds",
     output:
         labels="output/{dataset}/comparison/scanorama/predicted_labels.csv",
+        emb="output/{dataset}/comparison/scanorama/embeddings.csv",
+    benchmark: "output/{dataset}/benchmark/scanorama.tsv"
     params:
         seed=config["random_seed"],
         k=config["guidedpls_k"],
@@ -55,5 +61,5 @@ rule run_scanorama:
         mkdir -p output/{wildcards.dataset}/comparison/scanorama
         python3 src/run_scanorama.py \
             {input.rna} {input.atac} \
-            {output.labels} {params.seed} {params.k}
+            {output.labels} {params.seed} {params.k} {output.emb}
         """

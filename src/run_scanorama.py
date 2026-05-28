@@ -13,11 +13,12 @@ import pandas as pd
 import scanorama
 from sklearn.neighbors import KNeighborsClassifier
 
-rna_rds    = sys.argv[1]
-atac_rds   = sys.argv[2]
-out_labels = sys.argv[3]
-seed       = int(sys.argv[4])
-k_nn       = int(sys.argv[5])
+rna_rds        = sys.argv[1]
+atac_rds       = sys.argv[2]
+out_labels     = sys.argv[3]
+seed           = int(sys.argv[4])
+k_nn           = int(sys.argv[5])
+out_embeddings = sys.argv[6] if len(sys.argv) >= 7 else None
 
 np.random.seed(seed)
 print("=== Scanorama + kNN Label Transfer ===")
@@ -45,8 +46,12 @@ x_atac <- as.matrix(LayerData(atac, layer = "data")[common_genes, ])
 write.csv(t(x_rna),  "/tmp/scanorama_rna.csv",  row.names = FALSE)
 write.csv(t(x_atac), "/tmp/scanorama_atac.csv", row.names = FALSE)
 
-meta_rna <- data.frame(celltype = rna$celltype, stringsAsFactors = FALSE)
-write.csv(meta_rna, "/tmp/scanorama_rna_meta.csv", row.names = FALSE)
+meta_rna  <- data.frame(cell_id = colnames(rna),
+                        celltype = rna$celltype,  stringsAsFactors = FALSE)
+meta_atac <- data.frame(cell_id = colnames(atac),
+                        celltype = atac$celltype, stringsAsFactors = FALSE)
+write.csv(meta_rna,  "/tmp/scanorama_rna_meta.csv",  row.names = FALSE)
+write.csv(meta_atac, "/tmp/scanorama_atac_meta.csv", row.names = FALSE)
 """
 
 print("Extracting data via R ...")
@@ -102,4 +107,22 @@ result_df = pd.DataFrame({
 result_df.to_csv(out_labels, index=False)
 
 print(f"Predicted labels saved: {len(result_df)} cells")
+
+# --- 6. Embedding 保存 (UMAP用) ---
+if out_embeddings is not None:
+    print("Saving integrated embeddings ...")
+    atac_meta = pd.read_csv("/tmp/scanorama_atac_meta.csv")
+    n_rna  = rna_embed.shape[0]
+    n_atac = atac_embed.shape[0]
+    emb_all = np.vstack([rna_embed, atac_embed])
+    n_dim = emb_all.shape[1]
+    emb_df = pd.DataFrame(emb_all, columns=[f"SCAN_{i+1}" for i in range(n_dim)])
+    emb_df.insert(0, "celltype",
+        list(rna_meta["celltype"].values) + list(atac_meta["celltype"].values))
+    emb_df.insert(0, "modality", ["RNA"] * n_rna + ["ATAC"] * n_atac)
+    emb_df.insert(0, "cell_id",
+        list(rna_meta["cell_id"].values) + list(atac_meta["cell_id"].values))
+    emb_df.to_csv(out_embeddings, index=False)
+    print(f"Embeddings saved: {out_embeddings} ({len(emb_df)} x {n_dim})")
+
 print("Done.")

@@ -2,59 +2,60 @@
 
 Single-cell multi-omics experiments contributing to **Fig. 3** of the guided-PLS manuscript.
 
-**Important convention used throughout this repo:**
+**Important conventions used throughout this repo:**
 
-- **Guide Z** is one of `{none, stage, germlayer, stage_germlayer, stage_binned}` — defined in `config/config.yaml`.
-- **Evaluation label** is `celltype` (cell type annotation from the original publications).
-- **Cell type is NEVER used as a guide / training input for guided-PLS.** It is only used post-hoc to score the alignment quality. All baseline methods (Seurat, Harmony, Scanorama) likewise produce predictions that are scored against `celltype`.
+- **Guide Z** is one of `{stage, germlayer, stage_germlayer}` for Organogenesis or `{germlayer}` (= broad_lineage) for PBMC — defined in `config/config.yaml`.
+- **Evaluation label** is `celltype`. For PBMC it has ~11 categories; for Organogenesis it has 41.
+- **Cell type is NEVER used as a guide / training input for guided-PLS.** It is only used post-hoc to score alignment quality. All baseline methods (Seurat, Harmony, Scanorama) likewise produce predictions that are scored against `celltype`.
+
+**Headline result**: on PBMC (10x 10k scMultiome, 11 celltypes), `gPLS_germlayer` reaches accuracy 0.609 / ARI 0.481, outperforming Harmony and Scanorama and approaching Seurat (0.867). On Organogenesis (41 celltypes), gPLS underperforms (0.164) — the same algorithm in the same pipeline, only the guide-rank / celltype-count ratio changes. This is the regime-of-validity story.
 
 ## Main Figures (`plot/Figures/main/`)
 
-| File | Panel | Dataset | Guide Z | Eval label | Method comparison | What it shows | Main/Supp | Notes |
-|---|---|---|---|---|---|---|---|---|
-| `Fig3A_task_overview.{png,pdf}` *(TBD — schematic)* | A | Both | — | celltype | — | Task schematic: unpaired scRNA-Seq / scATAC-Seq integration, role of guide Z, distinction between guide Z and evaluation label, Organogenesis vs Testis data structure | Main | Conceptual figure, not data-driven. To be drawn (Illustrator/Inkscape). |
-| `Fig3B_organogenesis_performance.png` | B | Organogenesis (E8.5/E9.5/E10.5) | none / stage / germlayer / stage_germlayer | celltype | guidedPLS (4 guide conditions) vs Seurat / Harmony / Scanorama | Bar plot of accuracy and balanced accuracy across all methods. Currently Seurat leads (acc ≈ 0.48), best gPLS = stage_germlayer (acc ≈ 0.16). | Main | Source: `output/Organogenesis/figures/barplot_accuracy.png`. The `none` condition has predicted labels but is currently absent from `metrics.csv` — investigate. |
-| `Fig3C_testis_performance.png` | C | Testis (E18/P0/P3/P6) | none / stage_binned | celltype | guidedPLS only (Seurat/Harmony/Scanorama not run; fragment-barcode format prevents GAM) | Bar plot of accuracy and balanced accuracy for the two gPLS guide conditions. `none` (acc ≈ 0.29) outperforms `stage_binned` (acc ≈ 0.22) — interpret with stage mismatch in mind. | Main | Source: `output/Testis/figures/barplot_accuracy.png`. Used as **robustness / secondary benchmark**, not primary claim. |
-| `Fig3D_trueZ_vs_noZ_or_shuffledZ.{png,pdf}` *(TBD — needs experiment)* | D | Both | true Z / no Z / shuffled Z | celltype | guidedPLS only | Effect of guide Z informativeness: true Z vs no Z (already partially in B/C) vs shuffled Z (not yet implemented). | Main | Shuffled-Z baseline not yet run. Until then, the `none` vs guided comparison in Fig3B/C is the closest available signal. |
-| `Fig3E_organogenesis_confusion_best_gPLS.png` | E | Organogenesis | stage_germlayer | celltype | guidedPLS (best gPLS variant) | Confusion matrix of best-performing gPLS condition. Rows = true cell type, columns = predicted cell type, normalized within row. | Main | Source: `output/Organogenesis/figures/confusion_guidedpls_stage_germlayer.png`. Alternative: per-class F1 heatmap (not yet generated; CSVs in supplementary). |
+| File | Panel | What it shows | Source |
+|---|---|---|---|
+| `Fig3A_pbmc_method_umap.png` | A | PBMC per-method UMAP (combined panel: modality on top row, cell type on bottom). Shows that Seurat anchor-based integration spatially mixes the two modalities (top), while gPLS / Harmony / Scanorama keep them visually separated. Despite the modality separation, gPLS recovers celltype structure (bottom). | `output/PBMC/figures/umap_methods_combined.png` |
+| `Fig3B_pbmc_method_barplot.png` | B | PBMC bar plot of accuracy + balanced accuracy across all methods. gPLS in 2nd place behind Seurat, beats Harmony / Scanorama. | `output/PBMC/figures/barplot_accuracy.png` |
+| `Fig3C_pbmc_method_resources.png` | C | PBMC wall time + peak memory per method (Snakemake `benchmark:` measurement). Reveals the compute trade-off: gPLS processes raw ATAC peaks (~140K features) so it is the most expensive method on the current implementation. See takeaway item 3 for honest framing — accuracy advantage comes at compute cost; ATAC-sparse implementation would close most of the gap. | `output/PBMC/figures/method_resources.png` |
+
+The per-class F1 heatmaps (originally drafted as panels C–D) have been moved to the supplementary; the main now leads with UMAP / accuracy / compute and lets the heatmaps support the celltype-level interpretation in supp.
 
 ## Supplementary Figures and Tables (`plot/Figures/supplementary/`)
 
-| File | Type | Dataset | Methods / Conditions | What it shows | Notes |
-|---|---|---|---|---|---|
-| `SuppFig_organogenesis_ari_nmi.png` | Bar plot | Organogenesis | All (gPLS × 4 + 3 baselines) | ARI and NMI per method | Complement to Fig3B |
-| `SuppFig_testis_ari_nmi.png` | Bar plot | Testis | gPLS × 2 | ARI and NMI per method | Complement to Fig3C |
-| `SuppFig_summary_both_datasets.png` | Cross-dataset | Both | All available | Side-by-side comparison of headline metrics across datasets | — |
-| `SuppFig_organogenesis_confusion_guidedpls_none.png` | Confusion matrix | Organogenesis | guidedPLS, Z=none | Per-method confusion matrix | — |
-| `SuppFig_organogenesis_confusion_guidedpls_stage.png` | Confusion matrix | Organogenesis | guidedPLS, Z=stage | — | — |
-| `SuppFig_organogenesis_confusion_guidedpls_germlayer.png` | Confusion matrix | Organogenesis | guidedPLS, Z=germlayer | — | — |
-| `SuppFig_organogenesis_confusion_guidedpls_stage_germlayer.png` | Confusion matrix | Organogenesis | guidedPLS, Z=stage_germlayer | Same image as Fig3E (kept here for completeness) | — |
-| `SuppFig_organogenesis_confusion_seurat.png` | Confusion matrix | Organogenesis | Seurat | — | — |
-| `SuppFig_organogenesis_confusion_harmony.png` | Confusion matrix | Organogenesis | Harmony | — | — |
-| `SuppFig_organogenesis_confusion_scanorama.png` | Confusion matrix | Organogenesis | Scanorama | — | — |
-| `SuppFig_testis_confusion_guidedpls_none.png` | Confusion matrix | Testis | guidedPLS, Z=none | — | — |
-| `SuppFig_testis_confusion_guidedpls_stage_binned.png` | Confusion matrix | Testis | guidedPLS, Z=stage_binned | — | — |
-| `SuppFig_workflow_dag.png` | DAG | — | — | Snakemake rule graph for the entire pipeline | Regenerable via `bash workflow/dag.sh` |
-| `SuppTable_organogenesis_metrics.csv` | Table | Organogenesis | All | accuracy / balanced_accuracy / ARI / NMI / macro_f1 / weighted_f1 / n_cells per method | — |
-| `SuppTable_testis_metrics.csv` | Table | Testis | gPLS × 2 | same columns | — |
-| `SuppTable_organogenesis_per_class_f1.csv` | Table | Organogenesis | All | Per-cell-type F1 score for every method | Candidate source for a per-class F1 heatmap figure |
-| `SuppTable_testis_per_class_f1.csv` | Table | Testis | gPLS × 2 | Per-cell-type F1 score | — |
+### PBMC supplementary panels
+- `SuppFig_pbmc_ari_nmi.png` — ARI / NMI bar plot
+- `SuppFig_pbmc_confusion_{guidedpls_germlayer,seurat,harmony,scanorama}.png` — per-method confusion matrices
+- `SuppFig_pbmc_alluvial_{guidedpls_germlayer,seurat,harmony,scanorama}.png` — true→predicted label flow
+- `SuppFig_pbmc_method_umap_combined.png` — UMAP by-modality + by-celltype 2-panel
+- `SuppTable_pbmc_metrics.csv`, `SuppTable_pbmc_per_class_f1.csv`
 
-## Known gaps
+### Organogenesis as the "scale-up limitation" panel
+- `SuppFig_organogenesis_accuracy.png` — Bar plot showing the drop in gPLS accuracy at 41 celltypes
+- `SuppFig_organogenesis_ari_nmi.png` — ARI/NMI
+- `SuppFig_organogenesis_per_class_f1_heatmap.png` — Per-class F1 (gPLS wins on Gut / keratinocytes / cartilage, loses on blood / endothelium / neural-crest subtypes)
+- `SuppFig_organogenesis_method_umap_combined.png` — UMAP comparison across methods
+- `SuppFig_organogenesis_gPLS_umap_{stage,germlayer,stage_germlayer}.png` — gPLS UMAP per guide condition
+- `SuppFig_organogenesis_confusion_*.png` — per-method confusion matrices
+- `SuppFig_organogenesis_alluvial_*.png` — label flow
+- `SuppTable_organogenesis_metrics.csv`, `SuppTable_organogenesis_per_class_f1.csv`
 
-- **Fig3A schematic** has not been drawn yet.
-- **Fig3D shuffled-Z baseline** has not been run.
-- The `guidedpls_none` row is missing from `output/Organogenesis/evaluation/metrics.csv` even though predicted labels and confusion matrix exist — needs investigation before Fig3D can be assembled cleanly.
-- **UMAP / latent score plots** are listed in the task brief but not yet produced by the workflow.
+### Cross-dataset
+- `SuppFig_summary_both_datasets.png` — Side-by-side metrics across datasets (Organogenesis only at the moment; PBMC version pending if needed)
+
+## Known gaps / pending
+
+- **Fig 3A schematic** has not been drawn yet.
+- The cross-dataset summary panel (PBMC vs Organogenesis side-by-side) is not yet auto-generated by the workflow; would need a small extension of `src/plot_summary.R`.
+- **Testis** has been dropped from the manuscript (was previously a robustness panel). Raw data and outputs are retained at `data/Testis/` and `output/Testis/` for reference but are not exported into `plot/Figures/`.
 
 ## Regenerating figures
 
 ```bash
-# Full pipeline (regenerates output/{dataset}/figures/)
+# r-guidedpls has Rscript + python3+scanorama; snakemake env runs snakemake itself.
+export PATH=/home/koki/anaconda3/envs/r-guidedpls/bin:$PATH
 conda activate snakemake
-snakemake -s workflow/Snakefile --cores 8 -p
+snakemake -s workflow/Snakefile --cores 4 -p
 
-# Then refresh the curated copies
-cp output/Organogenesis/figures/barplot_accuracy.png plot/Figures/main/Fig3B_organogenesis_performance.png
-# ... etc. (see this file as the authoritative mapping)
+# Re-curate plot/Figures/ from output/{PBMC,Organogenesis}/figures/ — see the
+# cp commands in commit history (last full re-curation: PBMC pivot).
 ```

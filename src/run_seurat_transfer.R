@@ -12,10 +12,11 @@ suppressPackageStartupMessages({
 })
 
 args <- commandArgs(trailingOnly = TRUE)
-rna_rds    <- args[1]
-atac_rds   <- args[2]
-out_labels <- args[3]
-seed       <- as.integer(args[4])
+rna_rds        <- args[1]
+atac_rds       <- args[2]
+out_labels     <- args[3]
+seed           <- as.integer(args[4])
+out_embeddings <- if (length(args) >= 5) args[5] else NA_character_
 
 set.seed(seed)
 cat("=== Seurat Label Transfer ===\n")
@@ -72,4 +73,43 @@ result <- data.frame(
 write.csv(result, out_labels, row.names = FALSE)
 
 cat(sprintf("Predicted labels saved: %d cells\n", nrow(result)))
+
+# --- 6. Joint CCA embedding 保存 (UMAP用) ---
+if (!is.na(out_embeddings)) {
+  cat("Computing joint CCA embedding for UMAP ...\n")
+  # RunCCA は両側が同じ assay name のとき安定するため、ATAC GAM を
+  # RNA assay として再ラップしてから CCA を走らせる
+  # (Harmony スクリプトと同じパターン)。
+  rna_sub <- subset(rna, features = common_genes)
+  rna_sub <- NormalizeData(rna_sub, verbose = FALSE)
+  rna_sub <- ScaleData(rna_sub, features = common_genes, verbose = FALSE)
+  rna_sub$modality <- "RNA"
+
+  atac_counts <- LayerData(atac, layer = "counts")[common_genes, ]
+  atac_as_rna <- CreateSeuratObject(counts = atac_counts)
+  atac_as_rna <- AddMetaData(atac_as_rna, atac@meta.data)
+  atac_as_rna$modality <- "ATAC"
+  atac_as_rna <- NormalizeData(atac_as_rna, verbose = FALSE)
+  atac_as_rna <- ScaleData(atac_as_rna, features = common_genes, verbose = FALSE)
+
+  cca <- RunCCA(rna_sub, atac_as_rna, features = common_genes,
+                num.cc = n_dims, verbose = FALSE)
+  emb <- Embeddings(cca, "cca")
+  mod <- c(rna_sub$modality, atac_as_rna$modality)[
+    match(rownames(emb), c(colnames(rna_sub), colnames(atac_as_rna)))]
+  ct  <- c(rna_sub$celltype, atac_as_rna$celltype)[
+    match(rownames(emb), c(colnames(rna_sub), colnames(atac_as_rna)))]
+
+  emb_df <- data.frame(
+    cell_id  = rownames(emb),
+    modality = mod,
+    celltype = ct,
+    emb,
+    check.names = FALSE,
+    stringsAsFactors = FALSE
+  )
+  write.csv(emb_df, out_embeddings, row.names = FALSE)
+  cat(sprintf("Embeddings saved: %s (%d x %d)\n",
+              out_embeddings, nrow(emb_df), ncol(emb)))
+}
 cat("Done.\n")

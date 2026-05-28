@@ -103,21 +103,28 @@ colors <- c(
 
 p1 <- ggplot(df_acc, aes(x = method, y = value, fill = method)) +
   geom_col(width = 0.7) +
+  geom_text(aes(label = sprintf("%.3f", value)),
+            vjust = -0.4, size = 5) +
   facet_wrap(~metric, scales = "free_y",
     labeller = labeller(metric = c(
       accuracy = "Accuracy",
       balanced_accuracy = "Balanced Accuracy"
     ))) +
   scale_fill_manual(values = colors) +
-  theme_minimal(base_size = 14) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
+  theme_minimal(base_size = 18) +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.x  = element_text(angle = 30, hjust = 1, size = 14),
+    axis.text.y  = element_text(size = 13),
+    axis.title.y = element_text(size = 16),
+    strip.text   = element_text(size = 16, face = "bold"),
+    plot.title   = element_text(size = 18, face = "bold"),
     legend.position = "none"
   ) +
   labs(x = NULL, y = "Score", title = "Label Transfer Performance")
 
 ggsave(file.path(outdir, "barplot_accuracy.png"), p1,
-  width = 10, height = 6, dpi = 150)
+  width = 14, height = 6.5, dpi = 150)
 
 # --- 3. ARI / NMI バープロット ---
 cat("Plotting ARI/NMI barplot ...\n")

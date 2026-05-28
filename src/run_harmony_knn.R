@@ -12,11 +12,12 @@ suppressPackageStartupMessages({
 })
 
 args <- commandArgs(trailingOnly = TRUE)
-rna_rds    <- args[1]
-atac_rds   <- args[2]
-out_labels <- args[3]
-seed       <- as.integer(args[4])
-k_nn       <- as.integer(args[5])
+rna_rds        <- args[1]
+atac_rds       <- args[2]
+out_labels     <- args[3]
+seed           <- as.integer(args[4])
+k_nn           <- as.integer(args[5])
+out_embeddings <- if (length(args) >= 6) args[6] else NA_character_
 
 set.seed(seed)
 cat("=== Harmony + kNN Label Transfer ===\n")
@@ -100,4 +101,20 @@ result <- data.frame(
 write.csv(result, out_labels, row.names = FALSE)
 
 cat(sprintf("Predicted labels saved: %d cells\n", nrow(result)))
+
+# --- 6. Embedding 保存 (UMAP用) ---
+if (!is.na(out_embeddings)) {
+  cat("Saving harmony embeddings ...\n")
+  emb_df <- data.frame(
+    cell_id  = rownames(harmony_embeddings),
+    modality = combined$modality,
+    celltype = combined$celltype,
+    harmony_embeddings,
+    check.names = FALSE,
+    stringsAsFactors = FALSE
+  )
+  write.csv(emb_df, out_embeddings, row.names = FALSE)
+  cat(sprintf("Embeddings saved: %s (%d x %d)\n",
+              out_embeddings, nrow(emb_df), ncol(harmony_embeddings)))
+}
 cat("Done.\n")

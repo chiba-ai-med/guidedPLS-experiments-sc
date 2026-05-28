@@ -12,6 +12,7 @@ rule run_guidedpls:
     output:
         labels="output/{dataset}/guidedpls/{condition}/predicted_labels.csv",
         rdata="output/{dataset}/guidedpls/{condition}/guidedpls.RData",
+    benchmark: "output/{dataset}/benchmark/guidedpls_{condition}.tsv"
     params:
         r=config["guidedpls_r"],
         k=config["guidedpls_k"],
@@ -24,4 +25,17 @@ rule run_guidedpls:
             {input.rna_meta} \
             {output.labels} {output.rdata} \
             {params.r} {params.k}
+        """
+
+rule save_gpls_embeddings:
+    input:
+        rdata="output/{dataset}/guidedpls/{condition}/guidedpls.RData",
+        rna_meta="output/{dataset}/preprocess/rna_metadata.csv",
+        atac_meta="output/{dataset}/preprocess/atac_metadata.csv",
+    output:
+        emb="output/{dataset}/guidedpls/{condition}/embeddings.csv",
+    shell:
+        """
+        Rscript src/save_gpls_embeddings.R \
+            {input.rdata} {input.rna_meta} {input.atac_meta} {output.emb}
         """

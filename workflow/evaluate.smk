@@ -64,3 +64,127 @@ rule visualize:
             {params.methods} \
             output/{wildcards.dataset}/figures
         """
+
+# --- 計算時間 + メモリ使用量 ---
+def resources_inputs(wc):
+    ds = wc.dataset
+    inputs = {}
+    for c in guide_conditions_for(ds):
+        inputs[f"gp_{c}"] = f"output/{ds}/benchmark/guidedpls_{c}.tsv"
+    for m in comparison_methods_for(ds):
+        inputs[f"cm_{m}"] = f"output/{ds}/benchmark/{m}.tsv"
+    return inputs
+
+rule resource_barplot:
+    input:
+        unpack(resources_inputs),
+    output:
+        png="output/{dataset}/figures/method_resources.png",
+    params:
+        bench_dir=lambda wc: f"output/{wc.dataset}/benchmark",
+        conditions=lambda wc: ",".join(guide_conditions_for(wc.dataset)),
+        methods=lambda wc: ",".join(comparison_methods_for(wc.dataset)) or "NONE",
+    shell:
+        """
+        Rscript src/plot_method_resources.R \
+            {params.bench_dir} {params.conditions} {params.methods} \
+            {wildcards.dataset} {output.png}
+        """
+
+# --- Per-class F1 ヒートマップ ---
+rule per_class_f1_heatmap:
+    input:
+        per_class="output/{dataset}/evaluation/per_class_f1.csv",
+    output:
+        png="output/{dataset}/figures/per_class_f1_heatmap.png",
+    params:
+        conditions=lambda wc: ",".join(guide_conditions_for(wc.dataset)),
+        methods=lambda wc: ",".join(comparison_methods_for(wc.dataset)) or "NONE",
+    shell:
+        """
+        Rscript src/plot_per_class_f1_heatmap.R \
+            {input.per_class} {params.conditions} {params.methods} {output.png}
+        """
+
+# --- gPLS UMAP (条件ごと) ---
+rule umap_gpls:
+    input:
+        rdata="output/{dataset}/guidedpls/{condition}/guidedpls.RData",
+        rna_meta="output/{dataset}/preprocess/rna_metadata.csv",
+        atac_meta="output/{dataset}/preprocess/atac_metadata.csv",
+        preds="output/{dataset}/guidedpls/{condition}/predicted_labels.csv",
+    output:
+        png="output/{dataset}/figures/umap_gpls/{condition}/umap_combined.png",
+    params:
+        outdir=lambda wc: f"output/{wc.dataset}/figures/umap_gpls/{wc.condition}",
+    shell:
+        """
+        Rscript src/plot_gpls_umap.R \
+            {input.rdata} {input.rna_meta} {input.atac_meta} {input.preds} \
+            {wildcards.dataset} {wildcards.condition} {params.outdir}
+        """
+
+# --- ラベル流れ (alluvial) ---
+rule label_flow_gpls:
+    input:
+        preds="output/{dataset}/guidedpls/{condition}/predicted_labels.csv",
+        atac_meta="output/{dataset}/preprocess/atac_metadata.csv",
+    output:
+        png="output/{dataset}/figures/label_flow/guidedpls_{condition}.png",
+    shell:
+        """
+        Rscript src/plot_label_flow.R \
+            {input.preds} {input.atac_meta} \
+            "gPLS ({wildcards.condition})" {output.png}
+        """
+
+rule label_flow_comparison:
+    input:
+        preds="output/{dataset}/comparison/{method}/predicted_labels.csv",
+        atac_meta="output/{dataset}/preprocess/atac_metadata.csv",
+    output:
+        png="output/{dataset}/figures/label_flow/{method}.png",
+    wildcard_constraints:
+        method="seurat|harmony|scanorama"
+    shell:
+        """
+        Rscript src/plot_label_flow.R \
+            {input.preds} {input.atac_meta} \
+            "{wildcards.method}" {output.png}
+        """
+
+# --- 手法間 UMAP 比較 ---
+def umap_comparison_inputs(wc):
+    ds = wc.dataset
+    inputs = {}
+    for c in guide_conditions_for(ds):
+        inputs[f"gp_{c}"] = f"output/{ds}/guidedpls/{c}/embeddings.csv"
+    for m in comparison_methods_for(ds):
+        inputs[f"cm_{m}"] = f"output/{ds}/comparison/{m}/embeddings.csv"
+    return inputs
+
+def umap_comparison_pairs(wc):
+    ds = wc.dataset
+    pairs = []
+    for c in guide_conditions_for(ds):
+        pairs.append(f"gPLS_{c}=output/{ds}/guidedpls/{c}/embeddings.csv")
+    for m in comparison_methods_for(ds):
+        pairs.append(f"{m}=output/{ds}/comparison/{m}/embeddings.csv")
+    return " ".join(pairs)
+
+rule umap_method_comparison:
+    input:
+        unpack(umap_comparison_inputs),
+        rna_meta="output/{dataset}/preprocess/rna_metadata.csv",
+        atac_meta="output/{dataset}/preprocess/atac_metadata.csv",
+    output:
+        png="output/{dataset}/figures/umap_methods_combined.png",
+    params:
+        pairs=umap_comparison_pairs,
+        outdir=lambda wc: f"output/{wc.dataset}/figures",
+    shell:
+        """
+        Rscript src/plot_method_umap_comparison.R \
+            --meta={input.rna_meta},{input.atac_meta} \
+            {params.pairs} {wildcards.dataset} {params.outdir}
+        """

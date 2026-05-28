@@ -37,6 +37,7 @@ def all_methods_for(dataset):
 # =========================================================================
 include: "preprocess_organogenesis.smk"
 include: "preprocess_testis.smk"
+include: "preprocess_pbmc.smk"
 include: "prepare_inputs.smk"
 include: "run_guidedpls.smk"
 include: "run_comparison.smk"
@@ -50,6 +51,14 @@ def all_outputs():
     for ds in DATASET_NAMES:
         out.append(f"output/{ds}/evaluation/metrics.csv")
         out.append(f"output/{ds}/figures/barplot_accuracy.png")
+        out.append(f"output/{ds}/figures/per_class_f1_heatmap.png")
+        for c in guide_conditions_for(ds):
+            out.append(f"output/{ds}/figures/umap_gpls/{c}/umap_combined.png")
+            out.append(f"output/{ds}/figures/label_flow/guidedpls_{c}.png")
+        for m in comparison_methods_for(ds):
+            out.append(f"output/{ds}/figures/label_flow/{m}.png")
+        # 手法間 UMAP 比較: 比較手法が無いデータセットでも gPLS 同士で比較可能
+        out.append(f"output/{ds}/figures/umap_methods_combined.png")
     return out
 
 rule all:

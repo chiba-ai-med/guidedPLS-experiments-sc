@@ -8,7 +8,8 @@
 datasets:
   Organogenesis:
     guide_conditions:
-      - "none"
+      # "none" は Y が定数列1のため guidedPLS の SVD 段で退化 — 除外。
+      # 「guide を与えない条件」が必要なら Testis 側の shuffled-guide パターンを移植する。
       - "stage"
       - "germlayer"
       - "stage_germlayer"
@@ -18,12 +19,22 @@ datasets:
       - "scanorama"
     stages: ["E8.5", "E9.5", "E10.5"]
 
-  Testis:
+  # Testis (mouse spermatogenesis, ArchR scATAC) は drop。
+  # 比較手法が ArchR の barcode 形式と非互換で fair な benchmark が組めず、
+  # かつ全体 narrative を PBMC 中心にするため scope 外。
+  # 生データ・出力ファイルは `data/Testis/`, `output/Testis/` にそのまま残っている。
+
+  PBMC:
+    # 10x Genomics 10k PBMC scMultiome — 同一細胞由来の RNA + ATAC、~11k cells、
+    # ~12 celltype。Organogenesis (41 celltype) との対比で「celltype 数が小さい
+    # 設定」を検証するためのデータセット。
     guide_conditions:
-      - "none"
-      - "stage_binned"
-    comparison_methods: []   # GAMなし（fragmentバーコード形式の問題）
-    stages: ["E18", "P2-3", "P6-7"]
+      - "germlayer"   # broad_lineage (T/B/NK/Myeloid/Other) を germ_layer 列に格納
+    comparison_methods:
+      - "seurat"
+      - "harmony"
+      - "scanorama"
+    stages: ["PBMC"]
 
 # --- 比較手法のデフォルト (datasetsで未指定の場合) ---
 default_comparison_methods:

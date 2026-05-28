@@ -25,7 +25,7 @@ def main():
     parser.add_argument("--atac-meta", required=True)
     parser.add_argument("--condition", required=True,
                         choices=["none", "stage", "germlayer", "stage_germlayer",
-                                 "stage_binned"])
+                                 "stage_x_germlayer", "stage_binned"])
     parser.add_argument("--dataset", default="Organogenesis",
                         help="Dataset name (Organogenesis, Testis, ...)")
     parser.add_argument("--outdir", required=True)
@@ -116,6 +116,18 @@ def main():
         atac_meta["germlayer_unified"] = atac_meta["Germ.layer"]
         y1, y2 = build_onehot(rna_meta, atac_meta,
                                ["Stage", "germlayer_unified"])
+
+    elif args.condition == "stage_x_germlayer":
+        # Interaction encoding: each (Stage, germ_layer) combination becomes a
+        # single categorical level, raising the Y rank from 3+6=9 (additive
+        # "stage_germlayer") up to |Stage| × |germ_layer| ≤ 18.
+        rna_meta = rna_meta.copy()
+        atac_meta = atac_meta.copy()
+        rna_meta["stage_x_gl"] = (rna_meta["Stage"].astype(str)
+                                  + "::" + rna_meta["germ_layer"].astype(str))
+        atac_meta["stage_x_gl"] = (atac_meta["Stage"].astype(str)
+                                   + "::" + atac_meta["Germ.layer"].astype(str))
+        y1, y2 = build_onehot(rna_meta, atac_meta, ["stage_x_gl"])
 
     elif args.condition == "stage_binned":
         # Testis用: Stage列はビニング済み (E18, P2-3, P6-7)

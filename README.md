@@ -1,6 +1,6 @@
 # guidedPLS-experiments-sc
 
-A reproducible Snakemake workflow that benchmarks **guided-PLS** for the integration of single-cell multi-omics data (scRNA-Seq / scATAC-Seq) against established baseline methods (Seurat, Harmony, Scanorama). Two datasets are analyzed: mouse organogenesis (E8.5/E9.5/E10.5) and mouse testis (E18/P0/P3/P6).
+A reproducible Snakemake workflow that benchmarks **guided-PLS** for the integration of single-cell multi-omics data (scRNA-Seq / scATAC-Seq) against established baseline methods (Seurat, Harmony, Scanorama). Primary dataset: 10x Genomics 10k PBMC scMultiome (paired RNA + ATAC, ~12k cells, ~10 cell types). Mouse organogenesis (E8.5–E10.5, 41 cell types) is included as a larger-scale stress test in the supplementary.
 
 This repository is one of four sibling repositories that together support a single manuscript on guided-PLS:
 
@@ -13,12 +13,12 @@ This repository is one of four sibling repositories that together support a sing
 
 The pipeline is driven by a single top-level `workflow/Snakefile` that `include:`s the six sub-workflows listed below. Each sub-workflow is shared across datasets where possible; dataset-specific preprocessing is split into its own `.smk` file.
 
+- **workflow/preprocess_pbmc.smk**: Preprocessing of the 10x 10k PBMC scMultiome dataset (paired RNA + ATAC from the same cells, ~12k cells). Seurat clustering on RNA + marker-gene scoring assigns `celltype` (~10 categories) and `broad_lineage` (T/B/NK/Myeloid/Other). Signac is used for TF-IDF on peaks and to build the Gene Activity Matrix for the baselines.
 - **workflow/preprocess_organogenesis.smk**: Preprocessing of Organogenesis scRNA-Seq (GSE186068/GSE186069) and scATAC-Seq (CNP0003941) data for E8.5, E9.5, and E10.5 embryos.
-- **workflow/preprocess_testis.smk**: Preprocessing of Testis scRNA-Seq and scATAC-Seq (ArchR project) data for E18/P0/P3/P6.
 - **workflow/prepare_inputs.smk**: Construction of guided-PLS input matrices `X1`, `X2`, `Y1`, `Y2` from the preprocessed objects, parameterized by guide condition.
 - **workflow/run_guidedpls.smk**: Execution of guided-PLS across all guide conditions defined in `config/config.yaml`.
 - **workflow/run_comparison.smk**: Execution of baseline integration methods (`Seurat`, `Harmony`, `Scanorama`).
-- **workflow/evaluate.smk**: Quantitative evaluation (accuracy, balanced accuracy, ARI, NMI, macro/weighted F1, per-class F1) and visualization (bar plots, confusion matrices).
+- **workflow/evaluate.smk**: Quantitative evaluation (accuracy, balanced accuracy, ARI, NMI, macro/weighted F1, per-class F1) and visualization (bar plots, confusion matrices, per-class F1 heatmap, gPLS latent-space UMAP, method-comparison UMAP, true→predicted alluvial flow).
 
 ![](https://github.com/chiba-ai-med/guidedPLS-experiments-sc/blob/main/plot/Snakefile.png?raw=true)
 
@@ -80,8 +80,14 @@ The persistent, version-controlled outputs are:
 
 - `output/{dataset}/evaluation/metrics.csv` — summary metrics (accuracy / ARI / NMI / F1) per method
 - `output/{dataset}/evaluation/per_class_f1.csv` — per-class F1 scores
-- `output/{dataset}/figures/` — automatically generated bar plots and confusion matrices for every method
-- `plot/Figures/` — manuscript-quality figures, hand-curated from `output/{dataset}/figures/` and any additional plots produced ad hoc. This directory is the canonical source for figures included in the paper.
+- `output/{dataset}/figures/` — automatically generated figures for every method:
+  - bar plots (accuracy, balanced accuracy, ARI, NMI)
+  - confusion matrices (one per method)
+  - **per-class F1 heatmap** (method × cell type)
+  - **gPLS latent-space UMAPs** (one combined panel per guide condition, plus per-axis panels)
+  - **method-comparison UMAP** (all methods side-by-side)
+  - **label-flow alluvial** plots (true → predicted cell type, one per method)
+- `plot/Figures/` — manuscript-quality figures, hand-curated from `output/{dataset}/figures/` and any additional plots produced ad hoc. `plot/Figures/main/` is the canonical source for figures included in Fig. 3 of the paper; `plot/Figures/supplementary/` holds the supporting panels. See `plot/Figures/figure_index.md` for the mapping.
 
 ## License
 
