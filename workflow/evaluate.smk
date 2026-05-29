@@ -91,6 +91,42 @@ rule resource_barplot:
             {wildcards.dataset} {output.png}
         """
 
+# --- kNN accuracy + Time + Memory の統合 3-panel (Dark2, 透明背景) ---
+rule method_summary:
+    input:
+        unpack(resources_inputs),
+        metrics="output/{dataset}/evaluation/metrics.csv",
+    output:
+        acc="output/{dataset}/figures/method_accuracy.png",
+        time="output/{dataset}/figures/method_time.png",
+        mem="output/{dataset}/figures/method_memory.png",
+    params:
+        bench_dir=lambda wc: f"output/{wc.dataset}/benchmark",
+        outdir=lambda wc: f"output/{wc.dataset}/figures",
+        conditions=lambda wc: ",".join(guide_conditions_for(wc.dataset)),
+        methods=lambda wc: ",".join(comparison_methods_for(wc.dataset)) or "NONE",
+    shell:
+        """
+        Rscript src/plot_method_summary.R \
+            {input.metrics} {params.bench_dir} \
+            {params.conditions} {params.methods} \
+            {wildcards.dataset} {params.outdir}
+        """
+
+# --- 手法-色対応の横向き legend (別ファイル、透明背景) ---
+rule method_legend:
+    output:
+        png="output/{dataset}/figures/method_legend.png",
+    params:
+        conditions=lambda wc: ",".join(guide_conditions_for(wc.dataset)),
+        methods=lambda wc: ",".join(comparison_methods_for(wc.dataset)) or "NONE",
+    shell:
+        """
+        Rscript src/plot_method_legend.R \
+            {params.conditions} {params.methods} \
+            {wildcards.dataset} {output.png}
+        """
+
 # --- Per-class F1 ヒートマップ ---
 rule per_class_f1_heatmap:
     input:
@@ -179,6 +215,8 @@ rule umap_method_comparison:
         atac_meta="output/{dataset}/preprocess/atac_metadata.csv",
     output:
         png="output/{dataset}/figures/umap_methods_combined.png",
+        leg_mod="output/{dataset}/figures/umap_legend_modality.png",
+        leg_ct ="output/{dataset}/figures/umap_legend_celltype.png",
     params:
         pairs=umap_comparison_pairs,
         outdir=lambda wc: f"output/{wc.dataset}/figures",

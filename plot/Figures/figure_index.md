@@ -12,13 +12,25 @@ Single-cell multi-omics experiments contributing to **Fig. 3** of the guided-PLS
 
 ## Main Figures (`plot/Figures/main/`)
 
+All main files are **transparent-background PNGs** with axes / frames / titles / x-axis labels stripped, designed to be composited in Illustrator / Inkscape. Bar plots use the **RColorBrewer Dark2** palette mapped consistently to methods. **No legend is embedded in any data panel** — color → category mappings are saved as separate standalone PNG files.
+
+### Data panels
 | File | Panel | What it shows | Source |
 |---|---|---|---|
-| `Fig3A_pbmc_method_umap.png` | A | PBMC per-method UMAP (combined panel: modality on top row, cell type on bottom). Shows that Seurat anchor-based integration spatially mixes the two modalities (top), while gPLS / Harmony / Scanorama keep them visually separated. Despite the modality separation, gPLS recovers celltype structure (bottom). | `output/PBMC/figures/umap_methods_combined.png` |
-| `Fig3B_pbmc_method_barplot.png` | B | PBMC bar plot of accuracy + balanced accuracy across all methods. gPLS in 2nd place behind Seurat, beats Harmony / Scanorama. | `output/PBMC/figures/barplot_accuracy.png` |
-| `Fig3C_pbmc_method_resources.png` | C | PBMC wall time + peak memory per method (Snakemake `benchmark:` measurement). Reveals the compute trade-off: gPLS processes raw ATAC peaks (~140K features) so it is the most expensive method on the current implementation. See takeaway item 3 for honest framing — accuracy advantage comes at compute cost; ATAC-sparse implementation would close most of the gap. | `output/PBMC/figures/method_resources.png` |
+| `Fig3A_pbmc_method_umap.png` | A | PBMC per-method UMAP, faceted by method, 3 rows: top = modality, middle = germlayer / broad lineage, bottom = cell type. Data points only on transparent background. Shows that Seurat spatially mixes RNA + ATAC (top); gPLS / Harmony / Scanorama leave them visually separated; gPLS still organizes cells by germlayer (middle) and recovers celltype structure (bottom). | `output/PBMC/figures/umap_methods_combined.png` |
+| `Fig3B_pbmc_method_accuracy.png` | B1 | PBMC kNN cell-type accuracy per method (Dark2, no x-axis labels, no title). | `output/PBMC/figures/method_accuracy.png` |
+| `Fig3B_pbmc_method_time.png` | B2 | PBMC wall time per method (Snakemake `benchmark:` measurement). | `output/PBMC/figures/method_time.png` |
+| `Fig3B_pbmc_method_memory.png` | B3 | PBMC peak memory (max_rss) per method. | `output/PBMC/figures/method_memory.png` |
 
-The per-class F1 heatmaps (originally drafted as panels C–D) have been moved to the supplementary; the main now leads with UMAP / accuracy / compute and lets the heatmaps support the celltype-level interpretation in supp.
+### Standalone legends (composite once into the assembled figure)
+| File | What it shows | Layout | Source |
+|---|---|---|---|
+| `Fig3_method_legend.png` | Method colour mapping (Dark2): gPLS / Seurat / Harmony / Scanorama | 2 × 2 grid | `output/PBMC/figures/method_legend.png` |
+| `Fig3_umap_legend_modality.png` | Fig 3A top-row colours: RNA vs ATAC | horizontal | `output/PBMC/figures/umap_legend_modality.png` |
+| `Fig3_umap_legend_germlayer.png` | Fig 3A middle-row colours: T / B / NK / Myeloid / Other | horizontal | `output/PBMC/figures/umap_legend_germlayer.png` |
+| `Fig3_umap_legend_celltype.png` | Fig 3A bottom-row colours: 11 PBMC cell types | horizontal (2 rows for fit) | `output/PBMC/figures/umap_legend_celltype.png` |
+
+Balanced accuracy and the per-class F1 heatmaps have been moved to the supplementary.
 
 ## Supplementary Figures and Tables (`plot/Figures/supplementary/`)
 
