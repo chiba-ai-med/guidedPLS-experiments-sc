@@ -4,8 +4,8 @@
 
 rule run_guidedpls:
     input:
-        x1="output/{dataset}/guidedpls_input/{condition}/X1.csv",
-        x2="output/{dataset}/guidedpls_input/{condition}/X2.csv",
+        x1="output/{dataset}/guidedpls_input/{condition}/X1.mtx",
+        x2="output/{dataset}/guidedpls_input/{condition}/X2.mtx",
         y1="output/{dataset}/guidedpls_input/{condition}/Y1.csv",
         y2="output/{dataset}/guidedpls_input/{condition}/Y2.csv",
         rna_meta="output/{dataset}/guidedpls_input/{condition}/rna_metadata.csv",

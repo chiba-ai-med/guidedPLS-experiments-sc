@@ -9,8 +9,8 @@ rule prepare_inputs:
         atac_rds="output/{dataset}/preprocess/atac_processed.rds",
         atac_meta="output/{dataset}/preprocess/atac_metadata.csv",
     output:
-        x1="output/{dataset}/guidedpls_input/{condition}/X1.csv",
-        x2="output/{dataset}/guidedpls_input/{condition}/X2.csv",
+        x1="output/{dataset}/guidedpls_input/{condition}/X1.mtx",
+        x2="output/{dataset}/guidedpls_input/{condition}/X2.mtx",
         y1="output/{dataset}/guidedpls_input/{condition}/Y1.csv",
         y2="output/{dataset}/guidedpls_input/{condition}/Y2.csv",
         rna_meta_out="output/{dataset}/guidedpls_input/{condition}/rna_metadata.csv",

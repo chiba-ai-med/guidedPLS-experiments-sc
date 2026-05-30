@@ -1,15 +1,15 @@
 method,celltype,f1
-guidedpls_germlayer,B Naive,0.9149700598802395
-guidedpls_germlayer,CD14 Mono,0.8531101263745281
-guidedpls_germlayer,CD16 Mono,0.003898635477582846
-guidedpls_germlayer,CD4 T Memory,0.49839940901255847
-guidedpls_germlayer,CD4 T Naive,0.3454398708635997
-guidedpls_germlayer,CD8 T Memory,0.6290322580645161
-guidedpls_germlayer,CD8 T Naive,0.384652278177458
-guidedpls_germlayer,NK,0.687960687960688
+guidedpls_germlayer,B Naive,0.9114832535885168
+guidedpls_germlayer,CD14 Mono,0.8533288836976473
+guidedpls_germlayer,CD16 Mono,0.061224489795918366
+guidedpls_germlayer,CD4 T Memory,0.5059569074778201
+guidedpls_germlayer,CD4 T Naive,0.3549459684123026
+guidedpls_germlayer,CD8 T Memory,0.6385609893198426
+guidedpls_germlayer,CD8 T Naive,0.43508771929824563
+guidedpls_germlayer,NK,0.7058823529411765
 guidedpls_germlayer,Platelet,0.0
-guidedpls_germlayer,cDC,0.28426395939086296
-guidedpls_germlayer,pDC,0.0
+guidedpls_germlayer,cDC,0.304
+guidedpls_germlayer,pDC,0.03896103896103896
 seurat,B Naive,0.9348230912476723
 seurat,CD14 Mono,0.9146447896666084
 seurat,CD16 Mono,0.7486486486486487

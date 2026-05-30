@@ -44,7 +44,7 @@ def main():
     # --- 2. 特徴量行列をRから抽出 ---
     # guided-PLS はクロスモーダル: X1(RNA genes) と X2(ATAC peaks) は異なる特徴量
     r_script = f"""
-    suppressPackageStartupMessages({{library(Seurat); library(Signac)}})
+    suppressPackageStartupMessages({{library(Seurat); library(Signac); library(Matrix)}})
 
     rna <- readRDS("{args.rna_rds}")
     atac <- readRDS("{args.atac_rds}")
@@ -52,30 +52,29 @@ def main():
     # Seurat v5: JoinLayers if needed
     if (inherits(rna[["RNA"]], "Assay5")) rna[["RNA"]] <- JoinLayers(rna[["RNA"]])
 
-    # --- X1: RNA 遺伝子発現 (HVG) ---
+    # --- X1: RNA 遺伝子発現 (HVG), sparse のまま保持 ---
     hvg <- VariableFeatures(rna)
     cat(sprintf("RNA HVGs: %d\\n", length(hvg)))
-    x1 <- as.matrix(LayerData(rna, layer = "data")[hvg, ])
+    x1 <- LayerData(rna, layer = "data")[hvg, ]
+    if (!inherits(x1, "sparseMatrix")) x1 <- as(x1, "CsparseMatrix")
 
-    # --- X2: ATAC ピーク行列 (TF-IDF正規化) ---
+    # --- X2: ATAC ピーク行列 (TF-IDF正規化), sparse ---
     DefaultAssay(atac) <- "ATAC"
     if (inherits(atac[["ATAC"]], "Assay5")) atac[["ATAC"]] <- JoinLayers(atac[["ATAC"]])
-
-    # TF-IDF正規化
     atac <- RunTFIDF(atac)
-
-    # 可変ピークを選択 (top features by variance)
     atac <- FindTopFeatures(atac, min.cutoff = "q75")  # 上位25%のピーク
     top_peaks <- VariableFeatures(atac)
     cat(sprintf("ATAC peaks (top features): %d\\n", length(top_peaks)))
+    x2 <- LayerData(atac, layer = "data")[top_peaks, ]
+    if (!inherits(x2, "sparseMatrix")) x2 <- as(x2, "CsparseMatrix")
 
-    # TF-IDF正規化済みデータを抽出
-    x2 <- as.matrix(LayerData(atac, layer = "data")[top_peaks, ])
-
-    # cells × features に転置して保存
-    write.csv(t(x1), "{args.outdir}/X1.csv", row.names = FALSE)
-    write.csv(t(x2), "{args.outdir}/X2.csv", row.names = FALSE)
-    cat(sprintf("X1: %d cells x %d genes\\n", ncol(x1), nrow(x1)))
+    # cells x features (転置済) を MatrixMarket sparse 形式で保存。
+    # guidedPLS v1.2.0 以降は sparseMatrix を直接受理するので
+    # readMM で読み戻せばそのまま渡せる。
+    writeMM(t(x1), "{args.outdir}/X1.mtx")
+    writeMM(t(x2), "{args.outdir}/X2.mtx")
+    cat(sprintf("X1: %d cells x %d genes (sparse)\\n", ncol(x1), nrow(x1)))
+    cat(sprintf("X2: %d cells x %d peaks (sparse)\\n", ncol(x2), nrow(x2)))
     cat(sprintf("X2: %d cells x %d peaks\\n", ncol(x2), nrow(x2)))
     cat("Matrices saved.\\n")
     """

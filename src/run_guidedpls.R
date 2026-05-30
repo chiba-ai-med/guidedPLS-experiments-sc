@@ -11,6 +11,7 @@
 suppressPackageStartupMessages({
   library(guidedPLS)
   library(RANN)
+  library(Matrix)
 })
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -25,11 +26,14 @@ r_dim         <- as.integer(args[8])
 k_nn          <- as.integer(args[9])
 
 cat("=== guided-PLS execution ===\n")
+cat(sprintf("guidedPLS version: %s\n", as.character(packageVersion("guidedPLS"))))
 
-# --- 1. データ読み込み ---
+# --- 1. データ読み込み (X1, X2 は sparse, guidedPLS v1.2.0+ がそのまま受理) ---
 cat("Loading data ...\n")
-X1 <- as.matrix(read.csv(x1_file, header = TRUE))
-X2 <- as.matrix(read.csv(x2_file, header = TRUE))
+X1 <- readMM(x1_file)   # cells x features, sparse
+X2 <- readMM(x2_file)
+if (!inherits(X1, "CsparseMatrix")) X1 <- as(X1, "CsparseMatrix")
+if (!inherits(X2, "CsparseMatrix")) X2 <- as(X2, "CsparseMatrix")
 Y1 <- as.matrix(read.csv(y1_file, header = TRUE))
 Y2 <- as.matrix(read.csv(y2_file, header = TRUE))
 
