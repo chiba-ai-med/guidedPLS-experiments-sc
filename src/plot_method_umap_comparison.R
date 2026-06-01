@@ -42,23 +42,41 @@ for (p in pairs) {
   methods <- c(methods, kv[1]); paths <- c(paths, kv[2])
 }
 
-# Load broad_lineage lookup if --meta given
+# Load broad_lineage + stage lookups if --meta given
 broad_lookup <- NULL
+stage_lookup <- NULL
 if (length(meta_paths)) {
   parts <- lapply(meta_paths, function(mf) {
     if (!file.exists(mf)) return(NULL)
     md <- read.csv(mf, stringsAsFactors = FALSE)
     bl_col <- intersect(c("broad_lineage", "germ_layer", "Germ.layer"),
                         colnames(md))
-    if (length(bl_col) == 0) return(NULL)
+    st_col <- intersect(c("Stage", "stage", "development_stage"),
+                        colnames(md))
     id_col <- intersect(c("cell_id", "cell.id"), colnames(md))
     if (length(id_col) == 0) id_col <- colnames(md)[1]
-    data.frame(cell_id = md[[id_col[1]]],
-               broad_lineage = md[[bl_col[1]]],
-               stringsAsFactors = FALSE)
+    out <- data.frame(cell_id = md[[id_col[1]]], stringsAsFactors = FALSE)
+    if (length(bl_col)) out$broad_lineage <- md[[bl_col[1]]]
+    if (length(st_col)) out$stage         <- md[[st_col[1]]]
+    out
   })
-  broad_lookup <- do.call(rbind, parts)
-  cat(sprintf("broad_lineage lookup: %d cells\n", nrow(broad_lookup)))
+  combined_meta <- do.call(rbind, lapply(parts, function(p) {
+    cols <- c("cell_id", "broad_lineage", "stage")
+    for (c in setdiff(cols, colnames(p))) p[[c]] <- NA_character_
+    p[, cols]
+  }))
+  if ("broad_lineage" %in% colnames(combined_meta) &&
+      any(!is.na(combined_meta$broad_lineage))) {
+    broad_lookup <- combined_meta[, c("cell_id", "broad_lineage")]
+    cat(sprintf("broad_lineage lookup: %d cells\n", nrow(broad_lookup)))
+  }
+  if ("stage" %in% colnames(combined_meta) &&
+      length(unique(combined_meta$stage[!is.na(combined_meta$stage)])) > 1) {
+    stage_lookup <- combined_meta[, c("cell_id", "stage")]
+    cat(sprintf("stage lookup: %d cells (%d distinct stages)\n",
+                nrow(stage_lookup),
+                length(unique(stage_lookup$stage[!is.na(stage_lookup$stage)]))))
+  }
 }
 
 # Compute UMAP per method
@@ -87,6 +105,12 @@ for (i in seq_along(methods)) {
   } else {
     df_m$broad_lineage <- NA_character_
   }
+  if (!is.null(stage_lookup) && "cell_id" %in% colnames(d)) {
+    df_m$stage <-
+      stage_lookup$stage[match(d$cell_id, stage_lookup$cell_id)]
+  } else {
+    df_m$stage <- NA_character_
+  }
   umaps[[m]] <- df_m
   common_ct <- if (is.null(common_ct)) unique(d$celltype) else
     union(common_ct, unique(d$celltype))
@@ -98,6 +122,7 @@ all_df <- bind_rows(umaps)
 all_df$method <- factor(all_df$method, levels = methods)
 all_df <- all_df[!is.na(all_df$celltype), ]
 have_broad <- !all(is.na(all_df$broad_lineage))
+have_stage <- "stage" %in% colnames(all_df) && !all(is.na(all_df$stage))
 
 ct_levels <- sort(unique(all_df$celltype))
 n_ct <- length(ct_levels)
@@ -164,6 +189,11 @@ save_legend(mod_pal, "Modality",
             file.path(outdir, "umap_legend_modality.png"))
 save_legend(ct_pal,  "Cell type",
             file.path(outdir, "umap_legend_celltype.png"))
+# middle-row name varies by dataset semantics
+middle_row_label <- if (tolower(dataset_name) == "pbmc")
+  "Coarse-grained cell type" else "Germlayer"
+middle_row_file  <- if (tolower(dataset_name) == "pbmc")
+  "umap_legend_coarse_celltype.png" else "umap_legend_germlayer.png"
 
 w <- max(12, 6 * length(methods))   # 横方向を広めに (4 → 6 per method)
 ggsave(file.path(outdir, "umap_methods_by_modality.png"), p_mod,
@@ -171,6 +201,28 @@ ggsave(file.path(outdir, "umap_methods_by_modality.png"), p_mod,
 ggsave(file.path(outdir, "umap_methods_by_celltype.png"), p_ct,
        width = w, height = 6, dpi = 150, bg = "transparent")
 
+p_stage <- NULL
+if (have_stage) {
+  st_df <- all_df[!is.na(all_df$stage), ]
+  st_levels <- sort(unique(st_df$stage))
+  n_st <- length(st_levels)
+  st_pal <- if (n_st <= 9) brewer.pal(max(3, n_st), "YlOrRd")[seq_len(n_st)] else
+    colorRampPalette(brewer.pal(9, "YlOrRd"))(n_st)
+  names(st_pal) <- st_levels
+  save_legend(st_pal, "Stage",
+              file.path(outdir, "umap_legend_stage.png"))
+  p_stage <- ggplot(st_df, aes(UMAP1, UMAP2, colour = stage)) +
+    geom_point(size = 0.3, alpha = 0.55) +
+    facet_wrap(~method, nrow = 1, scales = "free") +
+    scale_colour_manual(values = st_pal, name = "Stage") +
+    guides(colour = guide_legend(override.aes = list(size = 2, alpha = 1))) +
+    base_theme +
+    labs(title = sprintf("%s — UMAP by stage across methods", dataset_name))
+  ggsave(file.path(outdir, "umap_methods_by_stage.png"), p_stage,
+         width = w, height = 5, dpi = 150, bg = "transparent")
+}
+
+p_bl <- NULL
 if (have_broad) {
   bl_df <- all_df[!is.na(all_df$broad_lineage), ]
   bl_levels <- sort(unique(bl_df$broad_lineage))
@@ -178,27 +230,30 @@ if (have_broad) {
   bl_pal <- if (n_bl <= 8) brewer.pal(max(3, n_bl), "Dark2")[seq_len(n_bl)] else
     colorRampPalette(brewer.pal(8, "Dark2"))(n_bl)
   names(bl_pal) <- bl_levels
-  save_legend(bl_pal, "Germlayer",
-              file.path(outdir, "umap_legend_germlayer.png"))
+  save_legend(bl_pal, middle_row_label,
+              file.path(outdir, middle_row_file))
   p_bl <- ggplot(bl_df, aes(UMAP1, UMAP2, colour = broad_lineage)) +
     geom_point(size = 0.3, alpha = 0.55) +
     facet_wrap(~method, nrow = 1, scales = "free") +
-    scale_colour_manual(values = bl_pal, name = "Germlayer / broad lineage") +
+    scale_colour_manual(values = bl_pal, name = middle_row_label) +
     guides(colour = guide_legend(override.aes = list(size = 2, alpha = 1))) +
     base_theme +
-    labs(title = sprintf("%s — UMAP by germlayer across methods", dataset_name))
+    labs(title = sprintf("%s — UMAP by %s across methods",
+                         dataset_name, middle_row_label))
   ggsave(file.path(outdir, "umap_methods_by_germlayer.png"), p_bl,
          width = w, height = 5, dpi = 150, bg = "transparent")
-  combined_plot <- (p_mod / p_bl / p_ct) &
-    theme(plot.background = element_rect(fill = "transparent", colour = NA))
-  ggsave(file.path(outdir, "umap_methods_combined.png"), combined_plot,
-         width = w, height = 16, dpi = 150, bg = "transparent")
-} else {
-  combined_plot <- (p_mod / p_ct) &
-    theme(plot.background = element_rect(fill = "transparent", colour = NA))
-  ggsave(file.path(outdir, "umap_methods_combined.png"), combined_plot,
-         width = w, height = 11, dpi = 150, bg = "transparent")
 }
+
+# Assemble combined: modality / (stage)? / (broad)? / celltype
+panel_list <- list(p_mod)
+if (!is.null(p_stage)) panel_list <- c(panel_list, list(p_stage))
+if (!is.null(p_bl))    panel_list <- c(panel_list, list(p_bl))
+panel_list <- c(panel_list, list(p_ct))
+n_rows <- length(panel_list)
+combined_plot <- Reduce(`/`, panel_list) &
+  theme(plot.background = element_rect(fill = "transparent", colour = NA))
+ggsave(file.path(outdir, "umap_methods_combined.png"), combined_plot,
+       width = w, height = 5.3 * n_rows, dpi = 150, bg = "transparent")
 
 cat("Saved UMAP comparison panels to:", outdir, "\n")
 cat("Done.\n")

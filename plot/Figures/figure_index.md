@@ -1,73 +1,71 @@
 # Figure Index — guidedPLS-experiments-sc
 
-Single-cell multi-omics experiments contributing to **Fig. 3** of the guided-PLS manuscript.
+Figures contributing to **Fig. 3** of the guided-PLS manuscript and to the four supplementary figures (**S3**, **S4**, **S5**, **S6**) sourced from this repository.
 
 **Important conventions used throughout this repo:**
 
-- **Guide Z** is one of `{stage, germlayer, stage_germlayer}` for Organogenesis or `{germlayer}` (= broad_lineage) for PBMC — defined in `config/config.yaml`.
-- **Evaluation label** is `celltype`. For PBMC it has ~11 categories; for Organogenesis it has 41.
-- **Cell type is NEVER used as a guide / training input for guided-PLS.** It is only used post-hoc to score alignment quality. All baseline methods (Seurat, Harmony, Scanorama) likewise produce predictions that are scored against `celltype`.
-
-**Headline result**: on PBMC (10x 10k scMultiome, 11 celltypes), `gPLS_germlayer` reaches accuracy 0.609 / ARI 0.481, outperforming Harmony and Scanorama and approaching Seurat (0.867). On Organogenesis (41 celltypes), gPLS underperforms (0.164) — the same algorithm in the same pipeline, only the guide-rank / celltype-count ratio changes. This is the regime-of-validity story.
+- **Guide Z** is `broad_lineage` (T / B / NK / Myeloid / Other) for PBMC, or one of `{stage, germlayer, stage_germlayer}` for Organogenesis — defined in `config/config.yaml`.
+- For PBMC, the broad lineage label is referred to as "**coarse-grained cell type**" in figure annotations, since PBMC is not a developmental dataset; the underlying column is the same one Snakemake calls `germ_layer` internally.
+- **Evaluation label** is `celltype`. For PBMC ~11 categories; for Organogenesis 41.
+- **Cell type is NEVER used as a guide / training input for guided-PLS.** It is only used post-hoc to score alignment quality.
 
 ## Main Figures (`plot/Figures/main/`)
 
-All main files are **transparent-background PNGs** with axes / frames / titles / x-axis labels stripped, designed to be composited in Illustrator / Inkscape. Bar plots use the **RColorBrewer Dark2** palette mapped consistently to methods. **No legend is embedded in any data panel** — color → category mappings are saved as separate standalone PNG files.
+All main files are **transparent-background PNGs** with axes / frames / titles / x-axis labels stripped, designed to be composited in Illustrator / Inkscape. Bar plots use the **RColorBrewer Dark2** palette mapped consistently to methods. **No legend is embedded in any data panel** — colour → category mappings are saved as separate standalone PNG files.
 
-### Data panels
-| File | Panel | What it shows | Source |
-|---|---|---|---|
-| `Fig3A_pbmc_method_umap.png` | A | PBMC per-method UMAP, faceted by method, 3 rows: top = modality, middle = germlayer / broad lineage, bottom = cell type. Data points only on transparent background. Shows that Seurat spatially mixes RNA + ATAC (top); gPLS / Harmony / Scanorama leave them visually separated; gPLS still organizes cells by germlayer (middle) and recovers celltype structure (bottom). | `output/PBMC/figures/umap_methods_combined.png` |
-| `Fig3B_pbmc_method_accuracy.png` | B1 | PBMC kNN cell-type accuracy per method (Dark2, no x-axis labels, no title). | `output/PBMC/figures/method_accuracy.png` |
-| `Fig3B_pbmc_method_time.png` | B2 | PBMC wall time per method (Snakemake `benchmark:` measurement). | `output/PBMC/figures/method_time.png` |
-| `Fig3B_pbmc_method_memory.png` | B3 | PBMC peak memory (max_rss) per method. | `output/PBMC/figures/method_memory.png` |
+### Data panels (PBMC)
+| File | Panel | What it shows |
+|---|---|---|
+| `Fig3A_pbmc_method_umap.png` | A | PBMC per-method UMAP, faceted by method, 3 rows: top = modality, middle = coarse-grained cell type (the guide Z), bottom = (fine) cell type. Data points only on transparent background. Shows that Seurat spatially mixes RNA + ATAC (top); gPLS / Harmony / Scanorama leave them visually separated; gPLS still organizes cells by coarse cell type (middle) and recovers fine-celltype structure (bottom). Column order left→right: **gPLS, Seurat, Harmony, Scanorama**. |
+| `Fig3B_pbmc_method_accuracy.png` | B1 | PBMC kNN cell-type accuracy per method (Dark2, no x-axis labels, no title). |
+| `Fig3B_pbmc_method_time.png` | B2 | PBMC wall time per method (Snakemake `benchmark:` measurement, guidedPLS v1.2.0 sparse path). |
+| `Fig3B_pbmc_method_memory.png` | B3 | PBMC peak memory (max_rss) per method. gPLS is the lowest of the four methods after v1.2.0. |
 
 ### Standalone legends (composite once into the assembled figure)
-| File | What it shows | Layout | Source |
-|---|---|---|---|
-| `Fig3_method_legend.png` | Method colour mapping (Dark2): gPLS / Seurat / Harmony / Scanorama | 2 × 2 grid | `output/PBMC/figures/method_legend.png` |
-| `Fig3_umap_legend_modality.png` | Fig 3A top-row colours: RNA vs ATAC | horizontal | `output/PBMC/figures/umap_legend_modality.png` |
-| `Fig3_umap_legend_germlayer.png` | Fig 3A middle-row colours: T / B / NK / Myeloid / Other | horizontal | `output/PBMC/figures/umap_legend_germlayer.png` |
-| `Fig3_umap_legend_celltype.png` | Fig 3A bottom-row colours: 11 PBMC cell types | horizontal (2 rows for fit) | `output/PBMC/figures/umap_legend_celltype.png` |
+| File | What it shows | Layout |
+|---|---|---|
+| `Fig3_method_legend.png` | Method colour mapping (Dark2): gPLS / Seurat / Harmony / Scanorama | 2 × 2 grid |
+| `Fig3_umap_legend_modality.png` | Fig 3A top-row colours: RNA vs ATAC | vertical |
+| `Fig3_umap_legend_coarse_celltype.png` | Fig 3A middle-row colours: T / B / NK / Myeloid / Other | vertical |
+| `Fig3_umap_legend_celltype.png` | Fig 3A bottom-row colours: 11 PBMC fine cell types | vertical |
 
-Balanced accuracy and the per-class F1 heatmaps have been moved to the supplementary.
+## Supplementary Figures
 
-## Supplementary Figures and Tables (`plot/Figures/supplementary/`)
+Organized by dataset. Only the figures selected for the manuscript (S3–S6) are kept; all other auxiliary panels generated by the workflow are pruned to keep the directory aligned with the published Supplementary.
 
-### PBMC supplementary panels
-- `SuppFig_pbmc_ari_nmi.png` — ARI / NMI bar plot
-- `SuppFig_pbmc_confusion_{guidedpls_germlayer,seurat,harmony,scanorama}.png` — per-method confusion matrices
-- `SuppFig_pbmc_alluvial_{guidedpls_germlayer,seurat,harmony,scanorama}.png` — true→predicted label flow
-- `SuppFig_pbmc_method_umap_combined.png` — UMAP by-modality + by-celltype 2-panel
-- `SuppTable_pbmc_metrics.csv`, `SuppTable_pbmc_per_class_f1.csv`
+### `plot/Figures/supplementary/PBMC/`
+| File | Supp ID | Content |
+|---|---|---|
+| `SuppFigS3_pbmc_alluvial.zip` | **S3** | Label-flow (alluvial) plots for the PBMC single-cell integration, one PNG per method (gPLS, Seurat, Harmony, Scanorama). Bundled as a single ZIP to keep the supplementary asset count manageable; unzip to obtain four standalone PNGs `SuppFigS3_pbmc_alluvial_{gpls,seurat,harmony,scanorama}.png`. |
+| `SuppFigS4_pbmc_confusion.zip` | **S4** | Confusion matrices for fine-grained cell-type recovery on PBMC, one PNG per method (gPLS, Seurat, Harmony, Scanorama). Bundled in the same way: unzip to get `SuppFigS4_pbmc_confusion_{gpls,seurat,harmony,scanorama}.png`. |
+| `SuppFigS5_pbmc_per_class_f1_heatmap.png` | **S5** | Per-cell-type F1-score heatmap on PBMC. Methods (4) × cell types (11). Allows direct reading of where each method succeeds / fails per cell type, including the sub-broad differentiation gPLS retains within each coarse-grained cell type. |
 
-### Organogenesis as the "scale-up limitation" panel
-- `SuppFig_organogenesis_accuracy.png` — Bar plot showing the drop in gPLS accuracy at 41 celltypes
-- `SuppFig_organogenesis_ari_nmi.png` — ARI/NMI
-- `SuppFig_organogenesis_per_class_f1_heatmap.png` — Per-class F1 (gPLS wins on Gut / keratinocytes / cartilage, loses on blood / endothelium / neural-crest subtypes)
-- `SuppFig_organogenesis_method_umap_combined.png` — UMAP comparison across methods
-- `SuppFig_organogenesis_gPLS_umap_{stage,germlayer,stage_germlayer}.png` — gPLS UMAP per guide condition
-- `SuppFig_organogenesis_confusion_*.png` — per-method confusion matrices
-- `SuppFig_organogenesis_alluvial_*.png` — label flow
-- `SuppTable_organogenesis_metrics.csv`, `SuppTable_organogenesis_per_class_f1.csv`
+### `plot/Figures/supplementary/Organogenesis/` — Fig 4-equivalent panel set
+S6 is delivered as the **complete set of panels for a Fig 4-style Organogenesis figure** in the **stage → germ-layer** framing: gPLS is trained with stage (3 categories: E8.5 / E9.5 / E10.5) as the guide Z, and germ layer (6 categories: Mesoderm, Neuroectoderm, Surface ectoderm, ExE embryo, Endoderm, NA) is the held-out evaluation label. The previous 41-class cell-type evaluation was dropped because (i) the granularity exceeded what any of the methods could resolve at this scale (gPLS reached only ~0.16 acc, baselines mid-30s–40s) and (ii) using germ layer as eval matches the gPLS philosophy of "broad guide → broad eval" cleanly. The germ-layer numbers were obtained without re-training any method — predicted cell types from the existing pipeline outputs are mapped to germ layers via the mode of the celltype → germ_layer table from the RNA metadata, then re-scored against the true germ_layer column of the ATAC metadata.
 
-### Cross-dataset
-- `SuppFig_summary_both_datasets.png` — Side-by-side metrics across datasets (Organogenesis only at the moment; PBMC version pending if needed)
+Only the clean **gPLS_stage** condition is included; gPLS_germlayer and gPLS_stage_germlayer would leak the eval label into the guide. Column order in the UMAP and bar plots is **gPLS, Seurat, Harmony, Scanorama** (left → right), same grammar as Fig 3 (PBMC).
 
-## Known gaps / pending
+| File | Role | Content |
+|---|---|---|
+| `SuppFigS6_organogenesis_method_umap.png` | data panel | Per-method UMAP, 3 rows (modality / stage / germ layer) × 4 columns, axis-/title-stripped, transparent background. Stage row shows the guide Z; germ layer row shows the evaluation axis. |
+| `SuppFigS6_organogenesis_method_accuracy.png` | data panel | Germ-layer accuracy per method (Dark2, no x-axis labels, no title). |
+| `SuppFigS6_organogenesis_method_time.png` | data panel | Wall time per method (Snakemake `benchmark:` measurement). |
+| `SuppFigS6_organogenesis_method_memory.png` | data panel | Peak memory (`max_rss`) per method — gPLS is the lowest on Organogenesis too (5.2 GB), beating Scanorama (6.5), Harmony (7.4), Seurat (8.3). |
+| `SuppFigS6_organogenesis_per_class_f1_heatmap.png` | data panel | Per-germ-layer F1 heatmap (6 germ layers × 4 methods). |
+| `SuppFigS6_organogenesis_method_legend.png` | standalone legend | Method colour mapping (Dark2, 4 methods), 2 × 2 grid. |
+| `SuppFigS6_organogenesis_umap_legend_modality.png` | standalone legend | UMAP row 1 colours: RNA vs ATAC. |
+| `SuppFigS6_organogenesis_umap_legend_stage.png` | standalone legend | UMAP row 2 colours: developmental stage (E8.5 / E9.5 / E10.5). |
+| `SuppFigS6_organogenesis_umap_legend_germlayer.png` | standalone legend | UMAP row 3 colours: germ layer. |
 
-- **Fig 3A schematic** has not been drawn yet.
-- The cross-dataset summary panel (PBMC vs Organogenesis side-by-side) is not yet auto-generated by the workflow; would need a small extension of `src/plot_summary.R`.
-- **Testis** has been dropped from the manuscript (was previously a robustness panel). Raw data and outputs are retained at `data/Testis/` and `output/Testis/` for reference but are not exported into `plot/Figures/`.
+Headline numbers (germ-layer accuracy / wall time / peak memory):
+gPLS = 0.271 / 137 s / 5.22 GB, Seurat = 0.482 / 89 s / 8.25 GB,
+Harmony = 0.226 / 59 s / 7.43 GB, Scanorama = 0.296 / 87 s / 6.45 GB.
+gPLS beats Harmony on accuracy, loses to Seurat / Scanorama, and is the most memory-efficient of the four.
 
-## Regenerating figures
+The germ-layer-eval re-scoring is produced by `src/build_org_fig4.R`, which reads the existing predictions / embeddings / benchmarks from `output/Organogenesis/` without re-running any method.
 
-```bash
-# r-guidedpls has Rscript + python3+scanorama; snakemake env runs snakemake itself.
-export PATH=/home/koki/anaconda3/envs/r-guidedpls/bin:$PATH
-conda activate snakemake
-snakemake -s workflow/Snakefile --cores 4 -p
+## Notes on supplementary curation
 
-# Re-curate plot/Figures/ from output/{PBMC,Organogenesis}/figures/ — see the
-# cp commands in commit history (last full re-curation: PBMC pivot).
-```
+- Per the manuscript scope, only the four supplementary figures listed above are required from this repository; the auxiliary plots produced by the workflow (per-condition gPLS UMAPs, bar plots of overall accuracy / ARI / NMI, method-comparison UMAPs for both datasets, label-flow panels for Organogenesis, etc.) are intentionally **not** copied into `plot/Figures/supplementary/`. They remain in `output/{dataset}/figures/` for reference and can be regenerated by re-running the Snakemake workflow.
+- For PBMC, the per-method gPLS file naming drops the `germlayer` / variant suffix because PBMC uses a single guide condition.
+- The Organogenesis Scanorama embeddings were re-run on 2026-06-01 to fix synthetic cell IDs (`RNA_0`, `RNA_1`, …) that were preventing the broad-lineage join in the method-comparison UMAP. This does not affect the per-class F1 heatmap (S6), which depends only on the predicted labels.
